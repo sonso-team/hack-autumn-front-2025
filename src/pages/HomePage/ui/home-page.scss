@@ -1,0 +1,61 @@
+@keyframes scaleModalShow {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes scaleModalHide {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes showBackdrop {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes hideBackdrop {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.Modal {
+  width: min(100%, 500px);
+  height: min(100%, 400px);
+  background-color: var(--black);
+  padding: 78px 22px;
+  box-shadow: 0 0 0 1px var(--light-gray);
+  margin: auto auto;
+  border-radius: 20px;
+
+  &::backdrop {
+    background-color: rgba(0, 0, 0, 0.35);
+  }
+
+  &[open] {
+    animation: scaleModalShow 0.5s ease forwards;
+
+    &::backdrop {
+      animation: showBackdrop 0.5s ease forwards;
+    }
+  }
+
+  &.closing {
+    animation: scaleModalHide 0.5s ease forwards;
+
+    &::backdrop {
+      animation: hideBackdrop 0.5s ease forwards;
+    }
+  }
+}
+
+.HomePage {
+  display: flex;
+  padding: 20px;
+  &__btn {
+    margin: 0 auto;
+    padding: 8px 16px;
+    background-color: rgba(103, 61, 61, 0.66);
+    color: white;
+    border-radius: 20px;
+  }
+}

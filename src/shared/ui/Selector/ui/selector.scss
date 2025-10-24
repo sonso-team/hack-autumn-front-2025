@@ -1,0 +1,60 @@
+.selector {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+  width: 100%;
+  max-width: 341px;
+
+  &__label {
+    padding: 15px 22px;
+    backdrop-filter: blur(10px);
+    background: var(--black-blur);
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__button {
+    transform: rotate(0);
+    transition: transform 0.3s;
+
+    &_open {
+      transform: rotate(-180deg);
+    }
+  }
+
+  &__list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+  }
+
+  &__item {
+    padding: 18px 22px;
+    box-shadow: 0 0 0 1px var(--light-gray);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    img {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      background-color: #222;
+    }
+  }
+
+  &__checkmark {
+    color: #0f0;
+    margin-left: 10px;
+  }
+}

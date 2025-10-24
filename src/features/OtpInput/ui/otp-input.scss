@@ -1,0 +1,20 @@
+.OtpInput {
+  display: flex;
+  width: 100%;
+  column-gap: 10px;
+  justify-content: center;
+
+  &__input {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 24px;
+    width: 40px;
+    height: 60px;
+    background: var(--dark-gray);
+    box-shadow: 0 0 0 1px var(--light-gray);
+    border-radius: 10px;
+  }
+}

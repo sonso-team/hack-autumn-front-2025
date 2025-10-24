@@ -1,0 +1,74 @@
+@keyframes scaleModalShow {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes scaleModalHide {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes showBackdrop {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes hideBackdrop {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.modal {
+  width: min(100%, 500px);
+  height: fit-content;
+  background-color: var((--black));
+  padding: 22px;
+  border-radius: 20px;
+  margin: auto auto;
+
+  &::backdrop {
+    background-color: rgba(0, 0, 0, 0.35);
+  }
+
+  &[open] {
+    animation: scaleModalShow 0.5s ease forwards;
+
+    &::backdrop {
+      animation: showBackdrop 0.5s ease forwards;
+    }
+  }
+
+  &.closing {
+    animation: scaleModalHide 0.5s ease forwards;
+
+    &::backdrop {
+      animation: hideBackdrop 0.5s ease forwards;
+    }
+  }
+
+  &__content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    row-gap: 10px;
+  }
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  &__buttons {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 10px;
+    column-gap: 20px;
+
+    button {
+      flex-shrink: 0;
+      flex-grow: 1;
+    }
+  }
+}
