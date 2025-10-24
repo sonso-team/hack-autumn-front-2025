@@ -1,114 +1,38 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './home-page.scss';
-import type { Socket } from 'socket.io-client';
-import { io } from 'socket.io-client';
 
-const HomePage: React.FC = () => {
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const pcRef = useRef<RTCPeerConnection | null>(null);
-  const socketRef = useRef<Socket | null>(null);
-  const localStreamRef = useRef<MediaStream | null>(null);
-  const [micOn, setMicOn] = useState(true);
-  const [camOn, setCamOn] = useState(true);
+import useConference from '../../../entities/conference';
+
+type VideoPlayerProps = {
+  stream: MediaStream;
+  id: string;
+};
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ stream, id }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const startCall = async () => {
-      // 1️⃣ Получаем локальный поток
-      const localStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
-      localStreamRef.current = localStream;
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = localStream;
-      }
-
-      // 2️⃣ Создаём RTCPeerConnection
-      const pc = new RTCPeerConnection({
-        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-      });
-      pcRef.current = pc;
-
-      // 3️⃣ Добавляем локальные треки
-      localStream
-        .getTracks()
-        .forEach((track) => pc.addTrack(track, localStream));
-
-      // 4️⃣ Приём удалённого потока
-      pc.ontrack = (event) => {
-        if (remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = event.streams[0];
-        }
-      };
-
-      // 5️⃣ ICE кандидаты
-      pc.onicecandidate = (event) => {
-        if (event.candidate) {
-          socketRef.current?.emit('ice-candidate', {
-            candidate: event.candidate,
-          });
-        }
-      };
-
-      // 6️⃣ Подключаемся к серверу
-      const socket = io('http://localhost:3001'); // твой сервер
-      socketRef.current = socket;
-
-      socket.emit('join-room', { roomId: 1 });
-
-      // 7️⃣ Получаем сигнал от другого участника
-      socket.on('offer', async ({ offer }) => {
-        await pc.setRemoteDescription(offer);
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        socket.emit('answer', { answer });
-      });
-
-      socket.on('answer', async ({ answer }) => {
-        await pc.setRemoteDescription(answer);
-      });
-
-      socket.on('ice-candidate', async ({ candidate }) => {
-        await pc.addIceCandidate(new RTCIceCandidate(candidate));
-      });
-
-      // 8️⃣ Если первый в комнате, создаём offer
-      socket.on('ready', async () => {
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        socket.emit('offer', { offer });
-      });
-    };
-
-    startCall();
-
-    return () => {
-      pcRef.current?.close();
-      socketRef.current?.disconnect();
-      localStreamRef.current?.getTracks().forEach((track) => track.stop());
-    };
-  }, []);
-
-  // Микрофон
-  const toggleMic = () => {
-    const track = localStreamRef.current?.getAudioTracks()[0];
-    if (!track) {
-      return;
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
     }
-    track.enabled = !track.enabled;
-    setMicOn(track.enabled);
-  };
+  }, [stream]);
 
-  // Камера
-  const toggleCam = () => {
-    const track = localStreamRef.current?.getVideoTracks()[0];
-    if (!track) {
-      return;
-    }
-    track.enabled = !track.enabled;
-    setCamOn(track.enabled);
-  };
+  return (
+    <video
+      ref={videoRef}
+      id={id}
+      autoPlay
+      playsInline
+      muted={false}
+      style={{ width: 200, height: 150, backgroundColor: 'black' }}
+    />
+  );
+};
+
+const HomePage: React.FC = () => {
+  const { micOn, camOn, localVideoRef, remoteStreams, toggleTrack } =
+    useConference({ roomId: '1', socketUrl: 'http://localhost:3001' });
+
+  console.log(remoteStreams);
 
   return (
     <div>
@@ -120,15 +44,20 @@ const HomePage: React.FC = () => {
         playsInline
         style={{ width: '200px' }}
       />
-      <video
-        ref={remoteVideoRef}
-        autoPlay
-        playsInline
-        style={{ width: '200px' }}
-      />
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+        {remoteStreams.map((remote) => (
+          <VideoPlayer
+            key={remote.id}
+            stream={remote.stream}
+            id={remote.id}
+          />
+        ))}
+      </div>
       <div>
-        <button onClick={toggleMic}>{micOn ? 'Mute' : 'Unmute'}</button>
-        <button onClick={toggleCam}>
+        <button onClick={() => toggleTrack('mic')}>
+          {micOn ? 'Mute' : 'Unmute'}
+        </button>
+        <button onClick={() => toggleTrack('cam')}>
           {camOn ? 'Stop Video' : 'Start Video'}
         </button>
       </div>

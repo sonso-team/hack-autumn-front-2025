@@ -1,9 +1,9 @@
 import React, { forwardRef } from 'react';
 import './selector.scss';
 import { Paragraph } from '../../Paragraph';
-import { iconMap } from '../../../utils/iconMap';
 import type { SelectorProps, SelectorRef } from '../model';
 import { useSelector } from '../api';
+import { icons } from '@/shared/lib/icons';
 
 export const Selector = forwardRef<SelectorRef, SelectorProps>(
   ({ label, options, onChange }, ref) => {
@@ -20,7 +20,7 @@ export const Selector = forwardRef<SelectorRef, SelectorProps>(
             className={`selector__button ${isOpen ? 'selector__button_open' : ''}`}
           >
             <img
-              src={iconMap.select}
+              src={icons.success}
               alt="select"
             />
           </button>
@@ -36,7 +36,7 @@ export const Selector = forwardRef<SelectorRef, SelectorProps>(
                 {option.value}
                 {selected?.key === option.key && (
                   <img
-                    src={iconMap.check}
+                    src={icons.success}
                     alt="select"
                   />
                 )}

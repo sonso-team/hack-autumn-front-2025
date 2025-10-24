@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { Validation } from '../../../utils/validator';
+import type { Validation } from '@/shared/lib/validator.ts';
 
 export interface InputRef {
   value?: string;
