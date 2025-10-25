@@ -2,8 +2,13 @@
 import type { IMessage } from '@stomp/stompjs';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { jwtDecode } from 'jwt-decode';
 
 type EventHandler = (data: any) => void;
+
+interface JwtPayload {
+  userId: string;
+}
 
 class SocketService {
   private static instance: SocketService;
@@ -122,70 +127,112 @@ class SocketService {
     }
 
     this.currentRoomId = roomId;
+
+    // ✅ Определяем тип пользователя
+    const token = localStorage.getItem('accessToken');
+    let userId: string | null = null;
+    let guestName: string | null = null;
+
+    if (token) {
+      try {
+        const decoded = jwtDecode<JwtPayload>(token);
+        userId = decoded.userId;
+        console.log('👤 Авторизованный пользователь:', userId);
+      } catch (error) {
+        console.error('Ошибка декодирования токена:', error);
+      }
+    }
+
+    if (!userId) {
+      // Гость - запрашиваем имя
+      guestName = prompt('Введите ваше имя:');
+      if (!guestName) {
+        alert('Имя обязательно для входа');
+        return;
+      }
+      console.log('👥 Гость:', guestName);
+    }
+
     console.log(`📥 Подключение к комнате: ${roomId}`);
 
     // Подписываемся на события комнаты
     this.subscribeToRoomEvents(roomId);
 
-    // Отправляем запрос на присоединение
-    this.emit('join-room', { roomId });
+    // ✅ Отправляем запрос на присоединение с userId или guestName
+    this.emit('join-room', {
+      roomId,
+      userId: userId || null,
+      guestName: guestName || null,
+    });
   }
 
   /**
    * Подписка на события комнаты
    */
   private subscribeToRoomEvents(roomId: string): void {
-    if (!this.stompClient) {
-      return;
-    }
+    if (!this.stompClient) return;
 
     console.log(`📡 Подписка на события комнаты ${roomId}`);
 
-    // Список участников - извлекаем sessionId из первого сообщения
-    this.stompClient.subscribe(`/topic/room/${roomId}/participants`, (message: IMessage) => {
-      const messageId = message.headers['message-id'];
+    // ✅ Список участников (с данными)
+    this.stompClient.subscribe(
+      `/topic/room/${roomId}/participants`,
+      (message: IMessage) => {
+        const messageId = message.headers['message-id'];
 
-      // Сохраняем session ID при первом получении
-      if (messageId && !this.currentSessionId) {
-        this.currentSessionId = messageId.split('-')[0];
-        console.log('💾 Extracted session ID:', this.currentSessionId);
+        // Сохраняем session ID при первом получении
+        if (messageId && !this.currentSessionId) {
+          this.currentSessionId = messageId.split('-')[0];
+          console.log('💾 Extracted session ID:', this.currentSessionId);
 
-        // Подписываемся на личные топики ПОСЛЕ получения sessionId
-        this.subscribeToPersonalTopics(roomId);
-      }
+          // Подписываемся на личные топики ПОСЛЕ получения sessionId
+          this.subscribeToPersonalTopics(roomId);
+        }
 
-      console.log('📩 Получен список участников:', message.body);
-      const data = JSON.parse(message.body);
-      this.trigger('participants', data.participants);
-    });
+        console.log('📩 Получен список участников:', message.body);
+        const data = JSON.parse(message.body);
+
+        // ✅ Теперь participants это массив ParticipantInfo
+        this.trigger('participants', data.participants);
+      },
+    );
 
     // Участник вышел
-    this.stompClient.subscribe(`/topic/room/${roomId}/user-left`, (message: IMessage) => {
-      console.log('📩 Участник вышел:', message.body);
-      const data = JSON.parse(message.body);
-      this.trigger('user-left', { socketId: data.socketId });
-    });
+    this.stompClient.subscribe(
+      `/topic/room/${roomId}/user-left`,
+      (message: IMessage) => {
+        console.log('📩 Участник вышел:', message.body);
+        const data = JSON.parse(message.body);
+        this.trigger('user-left', { socketId: data.socketId });
+      },
+    );
   }
 
   /**
    * Подписка на личные топики после получения sessionId
    */
   private subscribeToPersonalTopics(roomId: string): void {
-    if (!this.stompClient || !this.currentSessionId){
-      return;
-    }
+    if (!this.stompClient || !this.currentSessionId) return;
 
     const sessionId = this.currentSessionId;
     console.log(`📡 Подписка на личные топики для session ${sessionId}`);
 
-    // user-joined для этой сессии
+    // ✅ user-joined (с данными участника)
     this.stompClient.subscribe(
       `/topic/room/${roomId}/user-joined-${sessionId}`,
       (message: IMessage) => {
         console.log('📩 Новый участник:', message.body);
         const data = JSON.parse(message.body);
-        this.trigger('user-joined', { socketId: data.socketId });
-      }
+
+        // ✅ Передаём все данные участника
+        this.trigger('user-joined', {
+          sessionId: data.sessionId,
+          userId: data.userId,
+          nickname: data.nickname,
+          avatarUrl: data.avatarUrl,
+          isGuest: data.isGuest,
+        });
+      },
     );
 
     // Offer
@@ -195,7 +242,7 @@ class SocketService {
         console.log('📩 Получен offer:', message.body);
         const data = JSON.parse(message.body);
         this.trigger('offer', { offer: data.offer, from: data.from });
-      }
+      },
     );
 
     // Answer
@@ -205,7 +252,7 @@ class SocketService {
         console.log('📩 Получен answer:', message.body);
         const data = JSON.parse(message.body);
         this.trigger('answer', { answer: data.answer, from: data.from });
-      }
+      },
     );
 
     // ICE Candidate
@@ -214,8 +261,11 @@ class SocketService {
       (message: IMessage) => {
         console.log('📩 Получен ICE candidate:', message.body);
         const data = JSON.parse(message.body);
-        this.trigger('ice-candidate', { candidate: data.candidate, from: data.from });
-      }
+        this.trigger('ice-candidate', {
+          candidate: data.candidate,
+          from: data.from,
+        });
+      },
     );
   }
 
@@ -225,8 +275,8 @@ class SocketService {
   private getDestination(event: string): string {
     const mapping: Record<string, string> = {
       'join-room': '/app/join-room',
-      'offer': '/app/offer',
-      'answer': '/app/answer',
+      offer: '/app/offer',
+      answer: '/app/answer',
       'ice-candidate': '/app/ice-candidate',
     };
     return mapping[event] || `/app/${event}`;

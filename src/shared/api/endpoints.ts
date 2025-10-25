@@ -1,6 +1,6 @@
 const Endpoints = {
   BASE_URL: 'https://hack.kinoko.su', // ваш Spring backend
-  WS_URL: 'http://localhost:7000',   // для SockJS (без ws://)
+  WS_URL: 'wss://hack.kinoko.su', // для SockJS (без ws://)
   AUTH_REFRESH: '/api/auth/refresh',
   AUTH_LOGIN: '/api/auth/authorization',
   AUTH_REG: '/api/auth/registration',

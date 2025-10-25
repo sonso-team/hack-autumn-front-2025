@@ -5,23 +5,31 @@ import { Button } from '../../../shared/ui/Button';
 import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
 import { useConference } from '@/entities/conference';
 import ConferenceFooter from '@/widgets/ConferenceFooter';
+import ParticipantVideo from '@/features/ParticipantVideo';
+import copyCurrentUrl from '../../../shared/lib/copyCurrentPath';
 
 const ConferencePage = () => {
   const { pathname } = useLocation();
   const { roomId } = useAppSelector((state) => state.conferenceReducer);
   const getRoomId = () => {
-    if (roomId) {
-      return roomId;
-    }
+    if (roomId) return roomId;
     const paths = pathname.split('/');
     return paths[paths.length - 1];
   };
+
   const { localVideoRef, toggleTrack, micOn, remoteStreams, camOn } =
     useConference({ roomId: getRoomId() });
 
+  const hasRemoteParticipants = remoteStreams.length > 0;
+
   return (
     <main className="ConferencePage">
-      <section className="ConferencePage__streamsContainer">
+      <section
+        className={`ConferencePage__streamsContainer ${
+          hasRemoteParticipants ? 'ConferencePage__grid' : ''
+        }`}
+      >
+        {/* Локальное видео */}
         <div className="ConferencePage__videoWrapper">
           <video
             ref={localVideoRef}
@@ -31,7 +39,20 @@ const ConferencePage = () => {
             className="ConferencePage__videoPlayer"
           />
         </div>
-        {!remoteStreams.length && (
+
+        {/* Если есть участники — показываем их */}
+        {hasRemoteParticipants ? (
+          remoteStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
+            <ParticipantVideo
+              key={id}
+              stream={stream}
+              nickname={nickname}
+              isGuest={isGuest}
+              avatarUrl={avatarUrl}
+            />
+          ))
+        ) : (
+          // Иначе — заглушка
           <div className="ConferencePage__inviteBlock">
             <Paragraph
               level={2}
@@ -44,21 +65,16 @@ const ConferencePage = () => {
             </Paragraph>
             <div className="ConferencePage__inviteButtons">
               <Button
-                onClick={() => 1}
+                onClick={copyCurrentUrl}
                 className="ConferencePage__button"
               >
                 🔗 Копировать ссылку
-              </Button>
-              <Button
-                onClick={() => 1}
-                className="ConferencePage__button"
-              >
-                # Копировать код
               </Button>
             </div>
           </div>
         )}
       </section>
+
       <ConferenceFooter
         camToggle={() => toggleTrack('cam')}
         micToggle={() => toggleTrack('mic')}
