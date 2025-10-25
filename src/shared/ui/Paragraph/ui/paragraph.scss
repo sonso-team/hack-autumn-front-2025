@@ -8,13 +8,17 @@
     color: var(--default-text-color);
   }
 
+  &_white {
+    color: white;
+  }
+
   &_link {
-    color: var(--link-text-color);
+    color: var(--accent);
     text-decoration: underline;
   }
 
   &_error {
-    color: var(--red);
+    color: var(--danger);
   }
 
   &_level-1 {
@@ -37,6 +41,6 @@
   }
 
   &_level-5 {
-    font-size: 12px;
+    font-size: 14px;
   }
 }

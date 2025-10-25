@@ -43,9 +43,9 @@ const isEmail = (value: string): boolean => {
 
 const isEqualTo = (
   value: unknown,
-  params: { compareValue: unknown },
+  params: { compareValue: () => string },
 ): boolean => {
-  return value === params.compareValue;
+  return value !== params.compareValue();
 };
 
 const isCyrillic = (value: string, _params = {}): boolean => {

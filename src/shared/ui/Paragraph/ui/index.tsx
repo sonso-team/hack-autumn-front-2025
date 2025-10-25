@@ -5,7 +5,7 @@ import './paragraph.scss';
 interface ParagraphPropsI {
   children: string | ReactNode;
   level: 1 | 2 | 3 | 4 | 5;
-  mode?: 'default' | 'link' | 'error';
+  mode?: 'default' | 'link' | 'error' | 'white';
   className?: string;
 }
 

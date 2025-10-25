@@ -10,28 +10,20 @@ $breakpoint-5: 450px;
   --container-width: 1280px;
   // paddings
   --container-padding: 15px;
-  --default-ff: 'Jost';
-  --secondary-ff: 'Unbounded';
-  --default-text-color: var(--white);
-  --light-text-color: #fafafa;
-  --link-text-color: #6c23d8;
-  --dark-gray: #1f1f1f;
-  --light-gray: #4c4c4c;
-  --white: #ffffff;
-  --orange: #e6a610;
-  --green: #10682a;
-  --orange-50: rgba(230, 166, 16, 0.5);
-  --orange-30: rgba(230, 168, 16, 0.3);
-  --red: rgb(203, 42, 6);
-  --black: #ededed;
-  --black-blur: rgba(0, 0, 0, 0.56);
-  --white-50: rgba(255, 255, 255, 0.5);
-  --default-bg-color: var(--black);
-  --disabled-bg: #c6c6c6;
-
-  --red-button: #b50000;
-
-  --primary-color: #5936db;
+  --default-ff: 'Nunito Sans';
+  --default-text-color: black;
+  --accent: #6058ff;
+  --accent-darker: #3d35d5;
+  --accent-lighter: #e0deff;
+  --almoust-black: #1d1c24;
+  --bg: #fafcff;
+  --danger: #dc2f2f;
+  --dark-dark-gray: #42424d;
+  --dark-gray: #787878;
+  --gray: #aeb0c2;
+  --light-gray: #ededed;
+  --second-accent: #ef6323;
+  --second-accent-darker: #d2390a;
 
   // Input
   --input-border: #e2e2e2;

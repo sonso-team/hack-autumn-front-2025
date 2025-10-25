@@ -33,7 +33,7 @@ export default tseslint.config(
 
       // Best practices
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      'no-alert': 'error',
+      'no-alert': 'warn',
       'no-debugger': 'error',
       curly: ['error', 'all'],
       eqeqeq: ['error', 'always'],

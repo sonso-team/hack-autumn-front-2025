@@ -4,7 +4,7 @@ import type { OTPInputProps, OTPInputRef } from '../model';
 import { useOtpInput } from '../api';
 
 export const OtpInput = forwardRef<OTPInputRef, OTPInputProps>(
-  ({ length = 5, onChange }, ref) => {
+  ({ length = 6, onChange }, ref) => {
     const { values, handleKeyDown, handleChange, inputsRef } = useOtpInput(
       length,
       ref,

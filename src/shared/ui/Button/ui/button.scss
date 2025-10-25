@@ -1,7 +1,7 @@
 .button {
-  padding: 18px 15px;
-  border-radius: 10px;
-  height: 60px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  height: 48px;
   display: flex;
   text-align: center;
   max-width: min(306px, 100%);
@@ -15,14 +15,16 @@
   }
 
   &_default {
-    color: var(--white);
-    background-color: var(--orange);
-    &:disabled {
-      background-color: var(--orange-50);
+    h1,
+    p {
+      color: white;
     }
-    &:hover:not(:disabled) {
-      background-color: var(--orange-50);
+    background-color: var(--accent);
+    &:disabled, &:hover {
+      background-color: var(--accent-lighter);
+      border: var(--accent)
     }
+
   }
 
   &_green {
@@ -38,7 +40,7 @@
   }
 
   &_red {
-    background-color: var(--red);
+    background-color: var(--danger);
 
     &:disabled {
       background-color: rgba(203, 42, 6, 0.5);
@@ -49,10 +51,26 @@
     }
   }
 
+  &_gray {
+    background-color: var(--dark-dark-gray);
+
+    &:disabled {
+      background-color: rgba(168, 168, 168, 0.5);
+    }
+
+    &:hover:not(:disabled) {
+      background-color: rgba(221, 221, 221, 0.5);
+    }
+  }
+
   &_secondary {
-    color: var(--white);
     box-shadow: 0 0 0 1px var(--white);
-    background-color: var(--orange-30);
+    background-color: transparent;
+    h1,
+    p {
+      color: black;
+    }
+    border: 2px solid var(--accent);
 
     &:disabled {
       box-shadow: none;
