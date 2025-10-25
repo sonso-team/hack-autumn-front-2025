@@ -1,3 +1,5 @@
+@import '/src/shared/styles/base/Vars.scss';
+
 .inputs-buttons {
   width: max-content;
   display: flex;
@@ -52,4 +54,29 @@
 }
 .ProfileInputs > * {
   margin: 0 !important;
+}
+
+@media (max-width: $breakpoint-0) {
+  .ProfileInputs {
+    width: 100%;
+    gap: 22px;
+    margin-bottom: 4px;
+  }
+  .inputs-buttons {
+    gap: 0;
+  }
+}
+@media (max-width: $breakpoint-5) {
+  .ProfileForm {
+    width: 90%;
+  }
+  .inputs-buttons {
+    width: 100%;
+  }
+  .ProfileInputs {
+    width: 100%;
+    div {
+      width: 100%;
+    }
+  }
 }
