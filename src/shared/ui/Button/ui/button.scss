@@ -20,12 +20,11 @@
       color: white;
     }
     background-color: var(--accent);
-    //&:disabled {
-    //  background-color: var(--orange-50);
-    //}
-    //&:hover:not(:disabled) {
-    //  background-color: var(--orange-50);
-    //}
+    &:disabled, &:hover {
+      background-color: var(--accent-lighter);
+      border: var(--accent)
+    }
+
   }
 
   &_green {
@@ -41,7 +40,7 @@
   }
 
   &_red {
-    background-color: var(--red);
+    background-color: var(--danger);
 
     &:disabled {
       background-color: rgba(203, 42, 6, 0.5);
@@ -49,6 +48,18 @@
 
     &:hover:not(:disabled) {
       background-color: rgba(203, 42, 6, 0.67);
+    }
+  }
+
+  &_gray {
+    background-color: var(--dark-dark-gray);
+
+    &:disabled {
+      background-color: rgba(168, 168, 168, 0.5);
+    }
+
+    &:hover:not(:disabled) {
+      background-color: rgba(221, 221, 221, 0.5);
     }
   }
 

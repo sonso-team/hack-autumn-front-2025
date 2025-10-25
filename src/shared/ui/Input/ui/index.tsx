@@ -18,6 +18,7 @@ export const Input = forwardRef<InputRef, InputPropsI>((props, ref) => {
         ref={inputRef}
         type={dynamicType}
         name={name}
+        autoComplete="off"
         placeholder=" "
         className={`inputWrapper__input input ${value ? 'input_filled' : ''}`}
         value={value}

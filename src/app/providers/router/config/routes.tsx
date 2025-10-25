@@ -1,7 +1,9 @@
+import ProfilePage from '@/pages/ProfilePage';
 import type { RouteObject } from 'react-router-dom';
 import MainLayout from '../../../../layouts/MainLayout';
+import AuthPage from '../../../../pages/AuthPage/ui';
+import ConferencePage from '../../../../pages/ConferencePage';
 import ProtectedRoute from '../ui/ProtectedRoute';
-import ProfilePage from '@/pages/ProfilePage';
 
 const routes: RouteObject[] = [
   {
@@ -17,11 +19,15 @@ const routes: RouteObject[] = [
         element: <ProfilePage />,
         index: true,
       },
+      {
+        element: <AuthPage />,
+        path: '/auth/*'
+      },
+      {
+        element: <ConferencePage />,
+        path: '/conference/*'
+      }
     ],
-  },
-  {
-    element: <h1>Логин</h1>,
-    path: '/auth/login',
   },
 ];
 

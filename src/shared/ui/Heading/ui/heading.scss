@@ -12,8 +12,12 @@
     text-decoration: underline;
   }
 
+  &_bold {
+    font-weight: 700;
+  }
+
   &_level-1 {
-    font-size: 24px;
+    font-size: 28px;
   }
 
   &_level-2 {
