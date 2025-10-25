@@ -5,7 +5,7 @@ import './heading.scss';
 interface HeadingPropsI {
   children: string | ReactElement;
   level: 1 | 2 | 3 | 4 | 5;
-  mode?: 'default' | 'link';
+  mode?: 'default' | 'link' | 'bold';
   className?: string;
 }
 

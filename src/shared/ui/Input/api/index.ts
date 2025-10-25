@@ -47,11 +47,7 @@ export const useInput = (ref, props) => {
       }
     });
     isError.current = Object.values(errors.current).length !== 0;
-    if (mask) {
-      setValue(mask(e.target.value));
-    } else {
-      setValue(e.target.value);
-    }
+    setValue(e.target.value);
     // ToDo Убрать этот костыль
     setTimeout(() => onChange?.(e), 0);
   };

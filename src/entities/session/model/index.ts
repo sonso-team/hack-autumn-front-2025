@@ -37,6 +37,7 @@ const authSlice = createSlice({
           state.isError = false;
           state.user = action.payload.user;
           state.message = action.payload.message;
+          state.goConfirmStep = true;
           state.isLoading = false;
         },
       )
@@ -56,6 +57,7 @@ const authSlice = createSlice({
           state.isError = false;
           state.user = action.payload.user;
           state.message = action.payload.message;
+          state.goConfirmStep = true;
           state.isLoading = false;
         },
       )
@@ -142,7 +144,6 @@ const authSlice = createSlice({
         (state, action: PayloadAction<IWhoAmIResponse>) => {
           state.isLoading = false;
           state.user.name = action.payload.name;
-          state.user.phoneNumber = action.payload.phoneNumber;
           state.user.id = action.payload.id;
           state.user.email = action.payload.email;
         },

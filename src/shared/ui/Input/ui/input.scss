@@ -15,11 +15,11 @@
     top: 22.5px;
     transform: translateY(-50%);
     position: absolute;
-    font-size: 20px;
+    font-size: 16px;
     color: var(--dark-gray);
   }
   .input {
-    height: 49px;
+    height: 52px;
     box-shadow: 0 0 0 1px var(--light-gray);
     padding: 10px 15px;
     width: 100%;
@@ -40,24 +40,23 @@
   .input:not(:placeholder-shown) + .label {
     transform: none;
     font-size: 14px;
-    color: black;
-    top: -20px;
-    left: 2px;
+    color: var(--gray);
+    top: 2px;
   }
 
   &__error {
     padding-left: 15px;
     position: absolute;
-    top: 49px;
+    top: 52px;
   }
 
   &_invalid {
     .input {
-      box-shadow: 0 0 0 1px var(--red);
+      border: 1px solid var(--danger);
     }
 
     .label {
-      color: var(--red);
+      color: var(--danger);
     }
   }
 }

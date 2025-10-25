@@ -5,7 +5,7 @@ export interface ButtonPropsI {
   className?: string;
   onClick: (event: unknown) => void;
   custom?: boolean;
-  color?: 'default' | 'red' | 'green';
+  color?: 'default' | 'red' | 'green' | 'gray';
   style?: 'primary' | 'secondary';
   children: ReactElement | string;
 }

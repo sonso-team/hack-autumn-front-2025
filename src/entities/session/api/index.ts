@@ -13,12 +13,12 @@ const login = createAsyncThunk<
   IAuthResponse,
   IAuthData,
   { rejectValue: IAuthError }
->('auth/login', async ({ login, password }, { rejectWithValue }) => {
+>('auth/login', async ({ email, password }, { rejectWithValue }) => {
   try {
     const response: AxiosResponse<IAuthResponse> = await api.post(
       Endpoints.AUTH_LOGIN,
       {
-        login,
+        login: email,
         password,
       },
     );

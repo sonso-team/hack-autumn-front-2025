@@ -8,6 +8,10 @@
     color: var(--default-text-color);
   }
 
+  &_white {
+    color: white;
+  }
+
   &_link {
     color: var(--accent);
     text-decoration: underline;
