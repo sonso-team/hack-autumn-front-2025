@@ -18,15 +18,14 @@
   }
 }
 .change-delete-buttons {
+  button {
+    text-decoration: underline;
+    cursor: pointer;
+  }
   align-self: flex-start;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  .change,
-  .delete {
-    text-decoration: underline;
-    cursor: pointer;
-  }
   .change {
     color: var(--accent);
     &:hover {

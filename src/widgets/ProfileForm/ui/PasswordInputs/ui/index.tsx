@@ -2,10 +2,14 @@ import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import './password-inputs.scss';
 
-export const PasswordInputs = () => {
+export const PasswordInputs = ({
+  setPasswords,
+}: {
+  setPasswords: () => void;
+}) => {
   return (
     <div className="inputs-buttons">
-      <div className="PasswordInputs">
+      <div className="ProfileInputs">
         <Input
           initialValue={''}
           name={'old-pass'}
@@ -31,7 +35,7 @@ export const PasswordInputs = () => {
         </Button>
         <Button
           style="secondary"
-          onClick={() => {}}
+          onClick={setPasswords}
         >
           Назад
         </Button>
