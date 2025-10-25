@@ -2,6 +2,8 @@ import type { RouteObject } from 'react-router-dom';
 import ProtectedRoute from '../ui/ProtectedRoute';
 import MainLayout from '../../../../layouts/MainLayout';
 import HomePage from '@/pages/HomePage';
+import NotFoundPage from '@/pages/NotFoundPage';
+import WipPage from '@/pages/WipPage';
 
 const routes: RouteObject[] = [
   {
@@ -16,6 +18,14 @@ const routes: RouteObject[] = [
       {
         element: <HomePage />,
         index: true,
+      },
+      {
+        path: '*',
+        element: <NotFoundPage />,
+      },
+      {
+        path: '/wip',
+        element: <WipPage />,
       },
     ],
   },
