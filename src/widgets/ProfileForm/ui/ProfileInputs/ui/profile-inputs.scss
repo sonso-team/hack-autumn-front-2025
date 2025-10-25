@@ -1,0 +1,55 @@
+.inputs-buttons {
+  width: max-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  .buttons {
+    margin-top: 24px;
+    display: flex;
+    width: 100%;
+    gap: 12px;
+    button {
+      flex: 1;
+    }
+  }
+}
+.change-delete-buttons {
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  .change,
+  .delete {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .change {
+    color: var(--accent);
+    &:hover {
+      color: var(--accent-darker);
+    }
+  }
+  .delete {
+    color: var(--danger);
+    &:hover {
+      color: var(--error);
+    }
+  }
+}
+
+.ProfileInputs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  margin-top: 12px;
+  div {
+    max-width: 396px;
+    width: 396px;
+  }
+}
+.ProfileInputs > * {
+  margin: 0 !important;
+}

@@ -1,7 +1,7 @@
 import type { RouteObject } from 'react-router-dom';
-import ProtectedRoute from '../ui/ProtectedRoute';
 import MainLayout from '../../../../layouts/MainLayout';
-import HomePage from '@/pages/HomePage';
+import ProtectedRoute from '../ui/ProtectedRoute';
+import ProfilePage from '@/pages/ProfilePage';
 
 const routes: RouteObject[] = [
   {
@@ -14,7 +14,7 @@ const routes: RouteObject[] = [
     element: <MainLayout />,
     children: [
       {
-        element: <HomePage />,
+        element: <ProfilePage />,
         index: true,
       },
     ],
