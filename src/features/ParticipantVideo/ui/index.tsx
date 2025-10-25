@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../style/participantVideo.scss';
 
 interface ParticipantVideoProps {
@@ -15,21 +15,99 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
   isGuest,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [status, setStatus] = useState<string>('⏳ Инициализация...');
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.srcObject = stream;
+    const videoEl = videoRef.current;
+    if (!videoEl) {
+      return;
     }
+
+    // Подключаем поток
+    videoEl.srcObject = stream;
+    setStatus('🎥 Поток подключен');
+
+    // Попробуем воспроизвести
+    const tryPlay = async () => {
+      try {
+        await videoEl.play();
+        setStatus('✅ Видео воспроизводится');
+      } catch (err) {
+        setStatus('⚠️ Не удалось автозапустить (возможно, нужен клик)');
+        console.warn('Autoplay blocked:', err);
+      }
+    };
+
+    tryPlay();
+
+    // Диагностика: если поток неактивен
+    if (!stream.active) {
+      setStatus('❌ Поток неактивен');
+    }
+
+    // Проверим, что есть треки
+    const tracks = stream.getTracks();
+    if (tracks.length === 0) {
+      setStatus('❌ В потоке нет треков');
+    } else {
+      const info = tracks.map(
+        (t) => `${t.kind}: ${t.readyState} ${t.enabled ? '🟢' : '🔴'}`,
+      );
+      console.log(`🎧 Tracks for ${nickname}:`, info);
+    }
+
+    // Ловим обновления потока
+    const onInactive = () => setStatus('❌ Поток остановлен');
+    const onAddTrack = (e: any) => {
+      console.log('🎬 Добавлен трек:', e.track.kind);
+      setStatus('🎬 Поток обновлён');
+      tryPlay();
+    };
+
+    stream.addEventListener?.('inactive', onInactive);
+    stream.addEventListener?.('addtrack', onAddTrack);
+
+    return () => {
+      stream.removeEventListener?.('inactive', onInactive);
+      stream.removeEventListener?.('addtrack', onAddTrack);
+    };
   }, [stream]);
+
+  // Дополнительная проверка по событию `playing`
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl) {
+      return;
+    }
+    const onPlaying = () => {
+      console.log(`✅ Видео ${nickname} реально играет`);
+      setStatus('✅ Видео реально играет');
+    };
+    const onError = (e: any) => {
+      console.error('❌ Ошибка в видео:', e);
+      setStatus('❌ Ошибка при воспроизведении');
+    };
+
+    videoEl.addEventListener('playing', onPlaying);
+    videoEl.addEventListener('error', onError);
+
+    return () => {
+      videoEl.removeEventListener('playing', onPlaying);
+      videoEl.removeEventListener('error', onError);
+    };
+  }, []);
 
   return (
     <div className="ParticipantVideo">
       <video
+        key={stream.id} // при смене потока React создаст новый элемент
         ref={videoRef}
         autoPlay
         playsInline
+        muted
         className="ParticipantVideo__player"
       />
+
       <div className="ParticipantVideo__info">
         {avatarUrl && (
           <img
@@ -41,6 +119,7 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
         <span className="ParticipantVideo__name">
           {nickname} {isGuest && '(Гость)'}
         </span>
+        <div className="ParticipantVideo__status">{status}</div>
       </div>
     </div>
   );

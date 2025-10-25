@@ -12,7 +12,9 @@ const ConferencePage = () => {
   const { pathname } = useLocation();
   const { roomId } = useAppSelector((state) => state.conferenceReducer);
   const getRoomId = () => {
-    if (roomId) return roomId;
+    if (roomId) {
+      return roomId;
+    }
     const paths = pathname.split('/');
     return paths[paths.length - 1];
   };
