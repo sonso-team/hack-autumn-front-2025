@@ -25,13 +25,15 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
 
     // Подключаем поток
     videoEl.srcObject = stream;
-    setStatus('🎥 Поток подключен');
 
-    // Попробуем воспроизвести
+    // Для участников включаем звук
+    videoEl.muted = false;
+    videoEl.volume = 1;
+
     const tryPlay = async () => {
       try {
         await videoEl.play();
-        setStatus('✅ Видео воспроизводится');
+        setStatus('✅ Видео воспроизводится с аудио');
       } catch (err) {
         setStatus('⚠️ Не удалось автозапустить (возможно, нужен клик)');
         console.warn('Autoplay blocked:', err);
@@ -40,12 +42,11 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
 
     tryPlay();
 
-    // Диагностика: если поток неактивен
+    // Диагностика: проверяем активность потока
     if (!stream.active) {
       setStatus('❌ Поток неактивен');
     }
 
-    // Проверим, что есть треки
     const tracks = stream.getTracks();
     if (tracks.length === 0) {
       setStatus('❌ В потоке нет треков');
@@ -56,7 +57,7 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
       console.log(`🎧 Tracks for ${nickname}:`, info);
     }
 
-    // Ловим обновления потока
+    // Обработчики событий потока
     const onInactive = () => setStatus('❌ Поток остановлен');
     const onAddTrack = (e: any) => {
       console.log('🎬 Добавлен трек:', e.track.kind);
@@ -71,14 +72,15 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
       stream.removeEventListener?.('inactive', onInactive);
       stream.removeEventListener?.('addtrack', onAddTrack);
     };
-  }, [stream]);
+  }, [stream, nickname]);
 
-  // Дополнительная проверка по событию `playing`
+  // Проверка воспроизведения видео
   useEffect(() => {
     const videoEl = videoRef.current;
     if (!videoEl) {
       return;
     }
+
     const onPlaying = () => {
       console.log(`✅ Видео ${nickname} реально играет`);
       setStatus('✅ Видео реально играет');
@@ -95,7 +97,7 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
       videoEl.removeEventListener('playing', onPlaying);
       videoEl.removeEventListener('error', onError);
     };
-  }, []);
+  }, [nickname]);
 
   return (
     <div className="ParticipantVideo">
@@ -104,7 +106,6 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
         ref={videoRef}
         autoPlay
         playsInline
-        muted
         className="ParticipantVideo__player"
       />
 
