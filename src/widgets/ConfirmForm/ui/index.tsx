@@ -1,13 +1,14 @@
-import { Heading } from '../../../shared/ui/Heading';
-import { useConfirmForm } from '../api';
+import { Link, useNavigate } from 'react-router-dom';
 import { OtpInput } from '../../../features/OtpInput';
 import { Button } from '../../../shared/ui/Button';
+import { Heading } from '../../../shared/ui/Heading';
 import { Paragraph } from '../../../shared/ui/Paragraph';
-import { Link } from 'react-router-dom';
+import { useConfirmForm } from '../api';
 
 const ConfirmForm = (props: {request: ({ password }: { password:string }) => void}) => {
   const { isValid, submitHandler, codeRef, setIsValid, getIsValid } =
     useConfirmForm(props);
+    const navigate = useNavigate();
 
   return (
     <div className="ConfirmForm Form">
@@ -27,10 +28,11 @@ const ConfirmForm = (props: {request: ({ password }: { password:string }) => voi
           Подтвердить почту
         </Button>
         <Paragraph level={4}>
-          Неправильный номер ?{' '}
+          Неправильная почта ?{' '}
           <Link
-            to="/auth/"
+            to="/auth"
             className="AuthPage__link"
+            onClick={() => navigate('/auth')}
           >
             Назад
           </Link>

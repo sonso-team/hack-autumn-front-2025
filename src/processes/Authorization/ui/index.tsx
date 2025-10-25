@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import RegForm from '../../../widgets/RegForm/ui';
-import AuthForm from '../../../widgets/AuthForm/ui';
-import { useAppSelector } from '../../../shared/lib/hooks/useAppSelector';
 import { login, registration } from '../../../entities/session';
-import { useAppDispatch } from '../../../shared/lib/hooks/useAppDispatch';
-import { unmaskPhoneNumber } from '../../../shared/lib/format';
 import { authCode } from '../../../entities/session/api';
+import { useAppDispatch } from '../../../shared/lib/hooks/useAppDispatch';
+import { useAppSelector } from '../../../shared/lib/hooks/useAppSelector';
+import AuthForm from '../../../widgets/AuthForm/ui';
 import ConfirmForm from '../../../widgets/ConfirmForm/ui';
+import RegForm from '../../../widgets/RegForm/ui';
 
 const Authorization = () => {
   const [goConfirm, setGoConfirm] = useState<boolean>(false);
@@ -39,12 +38,13 @@ const Authorization = () => {
 
   const codeSubmit = async ({password}) => {
     try {
-      await dispatch(
+     const creds = await dispatch(
         authCode({
           login: user.email,
           password,
         }),
       ).unwrap();
+      if(creds){navigate('/')}
     } catch (err) {
       console.error('Ошибка входа:', err);
     }
