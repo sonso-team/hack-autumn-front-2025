@@ -1,14 +1,16 @@
+// src/pages/HomePage/ui/index.tsx
 import React, { useEffect, useRef } from 'react';
 import './home-page.scss';
-
 import useConference from '../../../entities/conference';
+import Endpoints from '../../../shared/api/endpoints'; // Добавьте импорт
 
 type VideoPlayerProps = {
   stream: MediaStream;
   id: string;
 };
+
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ stream, id }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -29,14 +31,18 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ stream, id }) => {
 };
 
 const HomePage: React.FC = () => {
-  const { micOn, camOn, localVideoRef, remoteStreams, toggleTrack } =
-    useConference({ roomId: '1', socketUrl: 'http://localhost:3001' });
+  // Используем правильный URL из конфигурации
+  const { micOn, camOn, localVideoRef, remoteStreams, toggleTrack } = useConference({
+    roomId: '1',
+    socketUrl: Endpoints.WS_URL, // Изменено: используем WS_URL из конфигурации
+  });
 
   console.log(remoteStreams);
 
   return (
     <div>
-      <h2>Room: 1</h2>
+      <h1>Room: 1</h1>
+
       <video
         ref={localVideoRef}
         autoPlay
@@ -44,23 +50,19 @@ const HomePage: React.FC = () => {
         playsInline
         style={{ width: '200px' }}
       />
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+
+      <div>
         {remoteStreams.map((remote) => (
-          <VideoPlayer
-            key={remote.id}
-            stream={remote.stream}
-            id={remote.id}
-          />
+          <VideoPlayer key={remote.id} stream={remote.stream} id={remote.id} />
         ))}
       </div>
-      <div>
-        <button onClick={() => toggleTrack('mic')}>
-          {micOn ? 'Mute' : 'Unmute'}
-        </button>
-        <button onClick={() => toggleTrack('cam')}>
-          {camOn ? 'Stop Video' : 'Start Video'}
-        </button>
-      </div>
+
+      <button onClick={() => toggleTrack('mic')}>
+        {micOn ? '🎤 Микрофон вкл' : '🎤 Микрофон выкл'}
+      </button>
+      <button onClick={() => toggleTrack('cam')}>
+        {camOn ? '📹 Камера вкл' : '📹 Камера выкл'}
+      </button>
     </div>
   );
 };
