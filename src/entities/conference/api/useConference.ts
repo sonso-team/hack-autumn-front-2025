@@ -3,6 +3,7 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { socketService } from '../../../shared/api/socket';
 import Endpoints from '../../../shared/api/endpoints';
+import { useAppSelector } from '../../../shared/lib/hooks/useAppSelector';
 
 interface ConferenceProps {
   roomId: string;
@@ -32,6 +33,9 @@ const useConference = ({ roomId }: ConferenceProps) => {
   const localStreamRef = useRef<MediaStream | null>(null);
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
 
+  const { name: username } = useAppSelector((state) => state.conferenceReducer);
+  console.log(username);
+
   const peers = useRef<PeerConnectionMap>({});
   const pendingIce: React.MutableRefObject<PendingMap> = useRef({});
   const participantsData = useRef<Record<string, ParticipantInfo>>({});
@@ -56,7 +60,7 @@ const useConference = ({ roomId }: ConferenceProps) => {
         localVideoRef.current.srcObject = stream;
       }
 
-      await socketService.connect(Endpoints.WS_URL);
+      await socketService.connect(Endpoints.WS_URL, username);
 
       // Присоединяемся к комнате (roomId обязан быть не пустым)
       socketService.joinRoom(roomId || '');
@@ -394,12 +398,20 @@ const useConference = ({ roomId }: ConferenceProps) => {
     }
   };
 
+  const disconnect = () => {
+    Object.values(peers.current).forEach((pc) => pc.close());
+    peers.current = {};
+    localStreamRef.current?.getTracks().forEach((t) => t.stop());
+    socketService.disconnect();
+  };
+
   return {
     localVideoRef,
     micOn,
     camOn,
     toggleTrack,
     remoteStreams,
+    disconnect,
   };
 };
 

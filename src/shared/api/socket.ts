@@ -17,6 +17,7 @@ class SocketService {
   private currentRoomId: string | null = null;
   private currentSessionId: string | null = null;
   private isConnected: boolean = false;
+  private name: string = 'Гость';
 
   private constructor() {}
 
@@ -30,7 +31,11 @@ class SocketService {
   /**
    * Подключение к WebSocket серверу через SockJS
    */
-  connect(serverUrl: string): Promise<void> {
+  connect(serverUrl: string, name: string): Promise<void> {
+    if (name) {
+      this.name = name;
+    }
+    console.log(name, this.name);
     return new Promise((resolve, reject) => {
       if (this.isConnected) {
         resolve();
@@ -117,7 +122,6 @@ class SocketService {
     // ✅ Определяем тип пользователя
     const token = localStorage.getItem('token');
     let userId: string | null = null;
-    let guestName: string | null = 'Гость';
 
     if (token) {
       try {
@@ -128,24 +132,15 @@ class SocketService {
       }
     }
 
-    if (!userId) {
-      // Гость - запрашиваем имя
-      guestName = prompt('Введите ваше имя:');
-      if (!guestName) {
-        alert('Имя обязательно для входа');
-        return;
-      }
-      console.log('👥 Гость:', guestName);
-    }
-
     // Подписываемся на события комнаты
     this.subscribeToRoomEvents(roomId);
 
     // ✅ Отправляем запрос на присоединение с userId или guestName
+    console.log(roomId, this.name);
     this.emit('join-room', {
       roomId,
       userId: userId || null,
-      guestName: guestName || null,
+      guestName: this.name,
     });
   }
 
