@@ -104,6 +104,7 @@ const useConference = ({ roomId }: ConferenceProps) => {
           offer,
           from,
         }: {
+          // eslint-disable-next-line no-undef
           offer: RTCSessionDescriptionInit;
           from: string;
         }) => {
@@ -117,7 +118,9 @@ const useConference = ({ roomId }: ConferenceProps) => {
           }
 
           const pc = peers.current[from];
-          if (!pc) return;
+          if (!pc) {
+            return;
+          }
 
           try {
             await pc.setRemoteDescription(new RTCSessionDescription(offer));
@@ -146,13 +149,16 @@ const useConference = ({ roomId }: ConferenceProps) => {
           answer,
           from,
         }: {
+          // eslint-disable-next-line no-undef
           answer: RTCSessionDescriptionInit;
           from: string;
         }) => {
           console.log('📩 Received answer from:', from);
 
           const pc = peers.current[from];
-          if (!pc) return;
+          if (!pc) {
+            return;
+          }
 
           try {
             await pc.setRemoteDescription(new RTCSessionDescription(answer));
@@ -176,6 +182,7 @@ const useConference = ({ roomId }: ConferenceProps) => {
           candidate,
           from,
         }: {
+          // eslint-disable-next-line no-undef
           candidate: RTCIceCandidateInit;
           from: string;
         }) => {
@@ -331,7 +338,9 @@ const useConference = ({ roomId }: ConferenceProps) => {
 
     async function createOffer(socketId: string): Promise<void> {
       const pc = peers.current[socketId];
-      if (!pc) return;
+      if (!pc) {
+        return;
+      }
 
       try {
         const offer = await pc.createOffer();
@@ -363,14 +372,18 @@ const useConference = ({ roomId }: ConferenceProps) => {
     switch (type) {
       case 'mic':
         track = localStreamRef.current?.getAudioTracks()[0];
-        if (!track) return;
+        if (!track) {
+          return;
+        }
         track.enabled = !track.enabled;
         setMicOn(track.enabled);
         break;
 
       case 'cam':
         track = localStreamRef.current?.getVideoTracks()[0];
-        if (!track) return;
+        if (!track) {
+          return;
+        }
         track.enabled = !track.enabled;
         setCamOn(track.enabled);
         break;

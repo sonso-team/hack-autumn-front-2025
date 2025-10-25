@@ -17,16 +17,16 @@ const routes: RouteObject[] = [
     children: [
       {
         element: <HomePage />,
-        index: true,
+        path: '/*',
       },
       {
         element: <AuthPage />,
-        path: '/auth/*'
+        path: '/auth/*',
       },
       {
         element: <ConferencePage />,
-        path: '/conference/*'
-      }
+        path: '/conference/*',
+      },
     ],
   },
 ];

@@ -12,16 +12,14 @@ import ConfirmForm from '../../../widgets/ConfirmForm/ui';
 const Authorization = () => {
   const [goConfirm, setGoConfirm] = useState<boolean>(false);
   const [confirmStep, setConfirmStep] = useState(false);
-  const { user } = useAppSelector(state => state.authReducer)
+  const { user } = useAppSelector((state) => state.authReducer);
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
   const regSubmit = async ({ email, password, nickname }) => {
     try {
-      await dispatch(
-        registration({ email, password, nickname })
-      ).unwrap();
+      await dispatch(registration({ email, password, nickname })).unwrap();
       setConfirmStep(true); // успех
     } catch (err) {
       console.error('Ошибка регистрации:', err);
@@ -37,7 +35,7 @@ const Authorization = () => {
     }
   };
 
-  const codeSubmit = async ({password}) => {
+  const codeSubmit = async ({ password }) => {
     try {
       await dispatch(
         authCode({
@@ -45,20 +43,20 @@ const Authorization = () => {
           password,
         }),
       ).unwrap();
+      navigate('/');
     } catch (err) {
       console.error('Ошибка входа:', err);
     }
+  };
+
+  if (confirmStep) {
+    return <ConfirmForm request={codeSubmit} />;
+  }
+  if (location.pathname === '/auth/login') {
+    return <AuthForm request={loginSubmit} />;
   }
 
-
-  if(confirmStep) {
-    return <ConfirmForm request={codeSubmit} />
-  }
-  if(location.pathname === '/auth/login') {
-    return  <AuthForm request={loginSubmit} />
-  }
-
-  return <RegForm request={regSubmit} />
+  return <RegForm request={regSubmit} />;
 };
 
 export default Authorization;

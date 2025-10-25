@@ -129,9 +129,9 @@ class SocketService {
     this.currentRoomId = roomId;
 
     // ✅ Определяем тип пользователя
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('token');
     let userId: string | null = null;
-    let guestName: string | null = null;
+    let guestName: string | null = 'Гость';
 
     if (token) {
       try {
@@ -170,7 +170,9 @@ class SocketService {
    * Подписка на события комнаты
    */
   private subscribeToRoomEvents(roomId: string): void {
-    if (!this.stompClient) return;
+    if (!this.stompClient) {
+      return;
+    }
 
     console.log(`📡 Подписка на события комнаты ${roomId}`);
 
@@ -212,7 +214,9 @@ class SocketService {
    * Подписка на личные топики после получения sessionId
    */
   private subscribeToPersonalTopics(roomId: string): void {
-    if (!this.stompClient || !this.currentSessionId) return;
+    if (!this.stompClient || !this.currentSessionId) {
+      return;
+    }
 
     const sessionId = this.currentSessionId;
     console.log(`📡 Подписка на личные топики для session ${sessionId}`);
