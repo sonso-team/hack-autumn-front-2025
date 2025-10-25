@@ -1,15 +1,15 @@
 import { icons } from '@/shared/lib/icons';
 import { Button } from '@/shared/ui/Button';
-import './header.scss';
 import { useNavigate } from 'react-router-dom';
+import './header.scss';
 
 const Header = () => {
   const navigate = useNavigate();
   return (
     <header className="header">
-      <img
+      <img className='logo'
         src={icons.logo}
-        alt=""
+        alt="" onClick={() => navigate('/')}
       />
       <Button onClick={() => navigate('/auth/login')}>Войти в систему</Button>
     </header>

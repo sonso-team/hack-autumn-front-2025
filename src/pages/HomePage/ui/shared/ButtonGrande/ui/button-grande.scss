@@ -9,7 +9,7 @@
   height: max-content;
   border: 2px solid var(--second-accent);
   border-radius: 8px;
-  background-color: transparent;
+  background-color: #fff;
 
   aspect-ratio: 1 / 1;
   width: 400px;
@@ -21,12 +21,17 @@
   }
   &:hover {
     transform: scale(1.04);
+    background-color: #fff;
+    border: 2px solid var(--second-accent);
   }
 }
 .smol {
   border: 2px solid var(--accent-darker);
   width: 190px;
   height: 190px;
+  &:hover{
+    border: 2px solid var(--accent-darker);
+  }
 }
 
 @media (max-width: $breakpoint-4) {

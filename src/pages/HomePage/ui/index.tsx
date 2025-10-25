@@ -1,7 +1,7 @@
-import React from 'react';
 import createAppointmentsImg from '@/shared/assets/images/appointments.png';
 import createMeetingImg from '@/shared/assets/images/create-meeting.png';
 import createEnterImg from '@/shared/assets/images/enter-meeting.png';
+import React from 'react';
 import './home-page.scss';
 import ButtonGrande from './shared/ButtonGrande/ui';
 
@@ -21,7 +21,7 @@ const HomePage: React.FC = () => {
           />
           <ButtonGrande
             imgUrl={createAppointmentsImg}
-            bottomText={'Записи'}
+            bottomText={'История'}
             className="smol"
           />
         </div>

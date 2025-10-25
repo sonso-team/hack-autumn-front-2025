@@ -1,3 +1,4 @@
+import HomePage from '@/pages/HomePage';
 import ProfilePage from '@/pages/ProfilePage';
 import type { RouteObject } from 'react-router-dom';
 import MainLayout from '../../../../layouts/MainLayout';
@@ -16,8 +17,12 @@ const routes: RouteObject[] = [
     element: <MainLayout />,
     children: [
       {
-        element: <ProfilePage />,
+        element: <HomePage />,
         index: true,
+      },
+      {
+        element: <ProfilePage />,
+        path: '/profile/*'
       },
       {
         element: <AuthPage />,
