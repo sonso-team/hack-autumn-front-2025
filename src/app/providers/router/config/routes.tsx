@@ -1,9 +1,9 @@
 import type { RouteObject } from 'react-router-dom';
 import ProtectedRoute from '../ui/ProtectedRoute';
 import MainLayout from '../../../../layouts/MainLayout';
-import HomePage from '@/pages/HomePage';
 import AuthPage from '../../../../pages/AuthPage/ui';
 import ConferencePage from '../../../../pages/ConferencePage';
+import HomePage from '@/pages/HomePage';
 
 const routes: RouteObject[] = [
   {

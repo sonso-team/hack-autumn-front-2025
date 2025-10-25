@@ -1,11 +1,10 @@
-import { hideLoader, showLoader } from '../../../entities/loader';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { hideLoader, showLoader } from '../../../entities/loader';
 import { useAppSelector } from '../../../shared/lib/hooks/useAppSelector';
 import { useAppDispatch } from '../../../shared/lib/hooks/useAppDispatch';
 import type { OTPInputRef } from '../../../features/OtpInput';
-import { authCode } from '../../../entities/session/api';
 
-export const useConfirmForm = ({request}) => {
+export const useConfirmForm = ({ request }) => {
   const dispatch = useAppDispatch();
   const authState = useAppSelector((state) => state.authReducer);
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -19,10 +18,8 @@ export const useConfirmForm = ({request}) => {
     }
   }, [dispatch, authState.isLoading]);
 
-
-
   const submitHandler = () => {
-    request({password: codeRef.current.value})
+    request({ password: codeRef.current.value });
   };
 
   const getIsValid = useCallback(() => {

@@ -3,25 +3,35 @@ import { icons } from '../../../shared/lib/icons';
 import './conferenceFooter.scss';
 import { Paragraph } from '../../../shared/ui/Paragraph';
 
-const ConferenceFooter = () => {
+const ConferenceFooter = ({
+  camToggle,
+  micToggle,
+  camOn,
+  micOn,
+}: {
+  camToggle: () => void;
+  micToggle: () => void;
+  camOn: boolean;
+  micOn: boolean;
+}) => {
   return (
     <footer className="conferenceFooter">
       <div className="conferenceFooter__leftSide">
         <Button
-          onClick={() => 1}
+          onClick={camToggle}
           color="gray"
         >
           <img
-            src={icons.cam}
+            src={camOn ? icons.cam : icons.camOn}
             alt=""
           />
         </Button>
         <Button
-          onClick={() => 1}
+          onClick={micToggle}
           color="gray"
         >
           <img
-            src={icons.micro}
+            src={micOn ? icons.micro : icons.microOn}
             alt=""
           />
         </Button>

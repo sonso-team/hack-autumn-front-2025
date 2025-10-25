@@ -1,9 +1,9 @@
+import { Link } from 'react-router-dom';
 import { Heading } from '../../../shared/ui/Heading';
 import { useConfirmForm } from '../api';
 import { OtpInput } from '../../../features/OtpInput';
 import { Button } from '../../../shared/ui/Button';
 import { Paragraph } from '../../../shared/ui/Paragraph';
-import { Link } from 'react-router-dom';
 
 const ConfirmForm = (props: {request: ({ password }: { password:string }) => void}) => {
   const { isValid, submitHandler, codeRef, setIsValid, getIsValid } =

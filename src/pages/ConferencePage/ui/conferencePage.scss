@@ -1,8 +1,8 @@
 .ConferencePage {
   display: flex;
-  justify-content: flex-end;
-  padding: 30px;
-  row-gap: 150px;
+  justify-content: space-between;
+  padding: 120px 30px;
+  row-gap: 30px;
   align-items: center;
   height: 100vh;
   background: rgba(0, 0, 0, 0.86);
@@ -15,7 +15,7 @@
   justify-content: center;
   align-items: stretch;
   gap: 40px;
-  width: 90%;
+  width: 100%;
   max-width: 1200px;
   transition: all 0.3s ease;
 }
@@ -117,10 +117,6 @@
 
 /* ==== 📱 Адаптив ==== */
 @media (max-width: 900px) {
-  .ConferencePage {
-    height: auto;
-    padding: 40px 0;
-  }
 
   .ConferencePage__streamsContainer {
     flex-direction: column;

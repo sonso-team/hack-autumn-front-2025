@@ -1,13 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch';
-import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
 import type { InputRef } from '../../../shared/ui/Input';
 import { hideLoader, showLoader } from '../../../entities/loader';
-import { registration } from '../../../entities/session';
-import { unmaskPhoneNumber } from '../../../shared/lib/format';
+import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
+import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch';
 
-export const useRegForm = ({request}) => {
+export const useRegForm = ({ request }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { isLoading, goConfirmStep } = useAppSelector(
@@ -35,7 +33,7 @@ export const useRegForm = ({request}) => {
     request({
       email: emailRef.current.value,
       password: passwordRef.current.value,
-      nickname: nicknameRef.current.value
+      nickname: nicknameRef.current.value,
     });
   };
 
@@ -47,8 +45,8 @@ export const useRegForm = ({request}) => {
       emailRef.current?.isDirty &&
       !passwordRef.current?.isError &&
       passwordRef.current?.isDirty &&
-        !repPasswordRef.current?.isError &&
-        repPasswordRef.current?.isDirty
+      !repPasswordRef.current?.isError &&
+      repPasswordRef.current?.isDirty
     );
   }, []);
 
