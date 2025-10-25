@@ -33,43 +33,31 @@ class SocketService {
   connect(serverUrl: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this.isConnected) {
-        console.log('✅ Уже подключено');
         resolve();
         return;
       }
 
-      console.log(`🔌 Подключаемся к: ${serverUrl}/ws/signaling`);
-
       this.stompClient = new Client({
         webSocketFactory: () => new SockJS(`${serverUrl}/ws/signaling`),
-
-        debug: (str: string) => {
-          console.log('🔍 STOMP:', str);
-        },
 
         reconnectDelay: 5000,
         heartbeatIncoming: 10000,
         heartbeatOutgoing: 10000,
 
         onConnect: (frame) => {
-          console.log('🟢 WebSocket подключен', frame);
           this.isConnected = true;
           resolve();
         },
 
         onDisconnect: () => {
-          console.log('🔴 WebSocket отключен');
           this.isConnected = false;
         },
 
         onStompError: (frame) => {
-          console.error('❌ STOMP error:', frame.headers['message']);
-          console.error('Error body:', frame.body);
           reject(new Error(frame.headers['message']));
         },
 
         onWebSocketError: (event) => {
-          console.error('❌ WebSocket error:', event);
           reject(event);
         },
       });
@@ -109,7 +97,6 @@ class SocketService {
     }
 
     const destination = this.getDestination(event);
-    console.log(`📤 Отправка [${event}] -> ${destination}:`, data);
 
     this.stompClient.publish({
       destination,
@@ -122,7 +109,6 @@ class SocketService {
    */
   joinRoom(roomId: string): void {
     if (!this.stompClient || !this.isConnected) {
-      console.error('❌ Сокет не подключен!');
       return;
     }
 
@@ -137,7 +123,6 @@ class SocketService {
       try {
         const decoded = jwtDecode<JwtPayload>(token);
         userId = decoded.userId;
-        console.log('👤 Авторизованный пользователь:', userId);
       } catch (error) {
         console.error('Ошибка декодирования токена:', error);
       }
@@ -152,8 +137,6 @@ class SocketService {
       }
       console.log('👥 Гость:', guestName);
     }
-
-    console.log(`📥 Подключение к комнате: ${roomId}`);
 
     // Подписываемся на события комнаты
     this.subscribeToRoomEvents(roomId);
@@ -185,13 +168,10 @@ class SocketService {
         // Сохраняем session ID при первом получении
         if (messageId && !this.currentSessionId) {
           this.currentSessionId = messageId.split('-')[0];
-          console.log('💾 Extracted session ID:', this.currentSessionId);
-
           // Подписываемся на личные топики ПОСЛЕ получения sessionId
           this.subscribeToPersonalTopics(roomId);
         }
 
-        console.log('📩 Получен список участников:', message.body);
         const data = JSON.parse(message.body);
 
         // ✅ Теперь participants это массив ParticipantInfo
@@ -203,7 +183,6 @@ class SocketService {
     this.stompClient.subscribe(
       `/topic/room/${roomId}/user-left`,
       (message: IMessage) => {
-        console.log('📩 Участник вышел:', message.body);
         const data = JSON.parse(message.body);
         this.trigger('user-left', { socketId: data.socketId });
       },
@@ -219,13 +198,11 @@ class SocketService {
     }
 
     const sessionId = this.currentSessionId;
-    console.log(`📡 Подписка на личные топики для session ${sessionId}`);
 
     // ✅ user-joined (с данными участника)
     this.stompClient.subscribe(
       `/topic/room/${roomId}/user-joined-${sessionId}`,
       (message: IMessage) => {
-        console.log('📩 Новый участник:', message.body);
         const data = JSON.parse(message.body);
 
         // ✅ Передаём все данные участника
@@ -243,7 +220,6 @@ class SocketService {
     this.stompClient.subscribe(
       `/topic/room/offer/${sessionId}`,
       (message: IMessage) => {
-        console.log('📩 Получен offer:', message.body);
         const data = JSON.parse(message.body);
         this.trigger('offer', { offer: data.offer, from: data.from });
       },
@@ -253,7 +229,6 @@ class SocketService {
     this.stompClient.subscribe(
       `/topic/room/answer/${sessionId}`,
       (message: IMessage) => {
-        console.log('📩 Получен answer:', message.body);
         const data = JSON.parse(message.body);
         this.trigger('answer', { answer: data.answer, from: data.from });
       },
@@ -263,7 +238,6 @@ class SocketService {
     this.stompClient.subscribe(
       `/topic/room/ice-candidate/${sessionId}`,
       (message: IMessage) => {
-        console.log('📩 Получен ICE candidate:', message.body);
         const data = JSON.parse(message.body);
         this.trigger('ice-candidate', {
           candidate: data.candidate,
@@ -322,7 +296,6 @@ class SocketService {
       this.currentRoomId = null;
       this.currentSessionId = null;
       this.eventHandlers.clear();
-      console.log('👋 Сокет отключен');
     }
   }
 }
