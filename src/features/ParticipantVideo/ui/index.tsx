@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import './ParticipantVideo.scss';
+import '../style/participantVideo.scss';
 
 interface ParticipantVideoProps {
   stream: MediaStream;
