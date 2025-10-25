@@ -1,5 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import type { IConferenceState, IConferenceResponse } from '../types';
 import { getLink } from '../api/conferenceThunks';
 
@@ -8,13 +8,21 @@ const initialState: IConferenceState = {
   isLoading: true,
   message: null,
   isConnected: false,
-  roomId: null
+  roomId: null,
+  name: null, // добавили поле для имени
 };
 
 const conferenceSlice = createSlice({
   name: 'conference',
   initialState,
-  reducers: {},
+  reducers: {
+    setRoomId: (state, action: PayloadAction<string | null>) => {
+      state.roomId = action.payload;
+    },
+    setName: (state, action: PayloadAction<string | null>) => {
+      state.name = action.payload; // редьюсер для установки имени
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getLink.pending, (state) => {
@@ -34,8 +42,10 @@ const conferenceSlice = createSlice({
       .addCase(getLink.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
-        state.message = action.payload.message;
-      })
+        state.message = action.payload?.message || 'Something went wrong';
+      });
   },
 });
+
+export const { setRoomId, setName } = conferenceSlice.actions;
 export default conferenceSlice.reducer;
