@@ -2,8 +2,13 @@
 import type { IMessage } from '@stomp/stompjs';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { jwtDecode } from 'jwt-decode';
 
 type EventHandler = (data: any) => void;
+
+interface JwtPayload {
+  userId: string;
+}
 
 class SocketService {
   private static instance: SocketService;
@@ -122,13 +127,43 @@ class SocketService {
     }
 
     this.currentRoomId = roomId;
+
+    // ✅ Определяем тип пользователя
+    const token = localStorage.getItem('accessToken');
+    let userId: string | null = null;
+    let guestName: string | null = null;
+
+    if (token) {
+      try {
+        const decoded = jwtDecode<JwtPayload>(token);
+        userId = decoded.userId;
+        console.log('👤 Авторизованный пользователь:', userId);
+      } catch (error) {
+        console.error('Ошибка декодирования токена:', error);
+      }
+    }
+
+    if (!userId) {
+      // Гость - запрашиваем имя
+      guestName = prompt('Введите ваше имя:');
+      if (!guestName) {
+        alert('Имя обязательно для входа');
+        return;
+      }
+      console.log('👥 Гость:', guestName);
+    }
+
     console.log(`📥 Подключение к комнате: ${roomId}`);
 
     // Подписываемся на события комнаты
     this.subscribeToRoomEvents(roomId);
 
-    // Отправляем запрос на присоединение
-    this.emit('join-room', { roomId });
+    // ✅ Отправляем запрос на присоединение с userId или guestName
+    this.emit('join-room', {
+      roomId,
+      userId: userId || null,
+      guestName: guestName || null,
+    });
   }
 
   /**
@@ -139,7 +174,7 @@ class SocketService {
 
     console.log(`📡 Подписка на события комнаты ${roomId}`);
 
-    // Список участников - извлекаем sessionId из первого сообщения
+    // ✅ Список участников (с данными)
     this.stompClient.subscribe(`/topic/room/${roomId}/participants`, (message: IMessage) => {
       const messageId = message.headers['message-id'];
 
@@ -154,6 +189,8 @@ class SocketService {
 
       console.log('📩 Получен список участников:', message.body);
       const data = JSON.parse(message.body);
+
+      // ✅ Теперь participants это массив ParticipantInfo
       this.trigger('participants', data.participants);
     });
 
@@ -174,13 +211,21 @@ class SocketService {
     const sessionId = this.currentSessionId;
     console.log(`📡 Подписка на личные топики для session ${sessionId}`);
 
-    // user-joined для этой сессии
+    // ✅ user-joined (с данными участника)
     this.stompClient.subscribe(
       `/topic/room/${roomId}/user-joined-${sessionId}`,
       (message: IMessage) => {
         console.log('📩 Новый участник:', message.body);
         const data = JSON.parse(message.body);
-        this.trigger('user-joined', { socketId: data.socketId });
+
+        // ✅ Передаём все данные участника
+        this.trigger('user-joined', {
+          sessionId: data.sessionId,
+          userId: data.userId,
+          nickname: data.nickname,
+          avatarUrl: data.avatarUrl,
+          isGuest: data.isGuest,
+        });
       }
     );
 

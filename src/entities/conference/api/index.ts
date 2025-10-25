@@ -7,11 +7,24 @@ interface ConferenceProps {
   socketUrl: string;
 }
 
+// ✅ Данные участника
+interface ParticipantInfo {
+  sessionId: string;
+  userId: string | null;
+  nickname: string;
+  avatarUrl: string | null;
+  isGuest: boolean;
+}
+
 type PeerConnectionMap = Record<string, RTCPeerConnection>;
 
+// ✅ Обновлённый RemoteStream с данными
 interface RemoteStream {
   id: string;
   stream: MediaStream;
+  nickname: string;
+  avatarUrl: string | null;
+  isGuest: boolean;
 }
 
 const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
@@ -19,6 +32,10 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const peers = useRef<PeerConnectionMap>({});
   const pendingIceCandidates = useRef<Record<string, RTCIceCandidate[]>>({});
+
+  // ✅ Храним данные участников
+  const participantsData = useRef<Record<string, ParticipantInfo>>({});
+
   const [remoteStreams, setRemoteStreams] = useState<RemoteStream[]>([]);
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
@@ -43,35 +60,45 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
       // Присоединяемся к комнате
       socketService.joinRoom(roomId);
 
-      // ✅ НОВОЕ: Обработка списка участников
-      socketService.on('participants', async (participants: string[]) => {
+      // ✅ Обработка списка участников (с данными)
+      socketService.on('participants', async (participants: ParticipantInfo[]) => {
         console.log('👥 Participants updated:', participants);
 
         const mySocketId = socketService.id;
 
-        // Создаём peer connections с каждым СУЩЕСТВУЮЩИМ участником (кроме себя)
-        participants.forEach((participantId) => {
-          if (participantId !== mySocketId && !peers.current[participantId]) {
-            console.log(`🔗 Инициируем соединение с ${participantId}`);
-            createPeerConnection(participantId, true); // МЫ инициаторы
+        // Сохраняем данные участников
+        participants.forEach((p) => {
+          participantsData.current[p.sessionId] = p;
+        });
+
+        // Создаём peer connections с каждым участником (кроме себя)
+        participants.forEach((participant) => {
+          if (participant.sessionId !== mySocketId && !peers.current[participant.sessionId]) {
+            console.log(`🔗 Инициируем соединение с ${participant.nickname} (${participant.sessionId})`);
+            createPeerConnection(participant.sessionId, true, participant);
           }
         });
       });
 
-      // ✅ ИЗМЕНЕНО: Обработка user-joined (НЕ создаём peer connection!)
-      socketService.on('user-joined', async ({ socketId }: { socketId: string }) => {
-        console.log('👤 User joined:', socketId);
-        console.log(`⏳ Waiting for offer from ${socketId}`);
-        // Новый участник САМ создаст peer connection с нами
+      // ✅ Обработка user-joined (с данными)
+      socketService.on('user-joined', async (participant: ParticipantInfo) => {
+        console.log('👤 User joined:', participant.nickname);
+
+        // Сохраняем данные участника
+        participantsData.current[participant.sessionId] = participant;
+
+        console.log(`⏳ Waiting for offer from ${participant.nickname}`);
       });
 
       // Получили Offer
       socketService.on('offer', async ({ offer, from }: { offer: RTCSessionDescriptionInit; from: string }) => {
         console.log('📩 Received offer from:', from);
 
+        const participant = participantsData.current[from];
+
         // Создаём peer connection если ещё нет
         if (!peers.current[from]) {
-          createPeerConnection(from, false); // НЕ инициатор
+          createPeerConnection(from, false, participant);
         }
 
         const pc = peers.current[from];
@@ -80,7 +107,7 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
         try {
           await pc.setRemoteDescription(new RTCSessionDescription(offer));
 
-          // ✅ Обрабатываем отложенные ICE candidates
+          // Обрабатываем отложенные ICE candidates
           const pending = pendingIceCandidates.current[from] || [];
           for (const candidate of pending) {
             await pc.addIceCandidate(candidate);
@@ -106,7 +133,7 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
         try {
           await pc.setRemoteDescription(new RTCSessionDescription(answer));
 
-          // ✅ Обрабатываем отложенные ICE candidates
+          // Обрабатываем отложенные ICE candidates
           const pending = pendingIceCandidates.current[from] || [];
           for (const candidate of pending) {
             await pc.addIceCandidate(candidate);
@@ -117,13 +144,12 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
         }
       });
 
-      // ✅ ИЗМЕНЕНО: Обработка ICE Candidate с очередью
+      // Обработка ICE Candidate с очередью
       socketService.on('ice-candidate', async ({ candidate, from }: { candidate: RTCIceCandidateInit; from: string }) => {
         console.log('📩 Получен ICE candidate от:', from);
 
         const pc = peers.current[from];
 
-        // Если peer connection не существует - добавляем в очередь
         if (!pc) {
           console.log(`⏳ Peer connection not ready for ${from}, queuing candidate`);
           if (!pendingIceCandidates.current[from]) {
@@ -133,7 +159,6 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
           return;
         }
 
-        // Если remoteDescription не установлен - добавляем в очередь
         if (!pc.remoteDescription) {
           console.log(`⏳ Remote description not set for ${from}, queuing candidate`);
           if (!pendingIceCandidates.current[from]) {
@@ -143,7 +168,6 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
           return;
         }
 
-        // Добавляем ICE candidate
         try {
           await pc.addIceCandidate(new RTCIceCandidate(candidate));
           console.log(`✅ Added ICE candidate from ${from}`);
@@ -163,15 +187,19 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
           delete peers.current[socketId];
         }
 
-        // Удаляем очередь ICE candidates
         delete pendingIceCandidates.current[socketId];
+        delete participantsData.current[socketId]; // ✅ Удаляем данные
       });
     };
 
-    function createPeerConnection(socketId: string, isInitiator: boolean): RTCPeerConnection {
+    // ✅ Обновлённая функция с поддержкой ParticipantInfo
+    function createPeerConnection(
+      socketId: string,
+      isInitiator: boolean,
+      participant?: ParticipantInfo
+    ): RTCPeerConnection {
       console.log(`🔗 Creating peer connection with ${socketId} (initiator: ${isInitiator})`);
 
-      // Если уже существует - возвращаем
       if (peers.current[socketId]) {
         console.log(`⚠️ Peer connection already exists for ${socketId}`);
         return peers.current[socketId];
@@ -184,12 +212,10 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
         ],
       });
 
-      // Добавляем локальные треки
       localStreamRef.current?.getTracks().forEach((track) => {
         pc.addTrack(track, localStreamRef.current!);
       });
 
-      // Обработка ICE candidates
       pc.onicecandidate = (event) => {
         if (event.candidate) {
           console.log(`🧊 Sending ICE candidate to ${socketId}`);
@@ -200,27 +226,43 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
         }
       };
 
-      // Получение удалённого трека
+      // ✅ Получение удалённого трека - добавляем данные участника
       pc.ontrack = (event) => {
         console.log(`📹 Received remote track from ${socketId}`);
         const remoteStream = event.streams[0];
+        const participantInfo = participantsData.current[socketId] || participant;
+
+        if (!participantInfo) {
+          console.warn(`⚠️ No participant data for ${socketId}`);
+          return;
+        }
 
         setRemoteStreams((prev) => {
           const existing = prev.find((s) => s.id === socketId);
           if (!existing) {
-            return [...prev, { id: socketId, stream: remoteStream }];
+            return [
+              ...prev,
+              {
+                id: socketId,
+                stream: remoteStream,
+                nickname: participantInfo.nickname,
+                avatarUrl: participantInfo.avatarUrl,
+                isGuest: participantInfo.isGuest,
+              },
+            ];
           }
           return prev;
         });
       };
 
-      // Обработка изменений connection state
       pc.onconnectionstatechange = () => {
         console.log(`🔌 Connection state with ${socketId}: ${pc.connectionState}`);
 
-        if (pc.connectionState === 'disconnected' ||
+        if (
+          pc.connectionState === 'disconnected' ||
           pc.connectionState === 'failed' ||
-          pc.connectionState === 'closed') {
+          pc.connectionState === 'closed'
+        ) {
           console.log(`⚠️ Connection with ${socketId} closed`);
           setRemoteStreams((prev) => prev.filter((remote) => remote.id !== socketId));
           delete peers.current[socketId];
@@ -229,7 +271,6 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
 
       peers.current[socketId] = pc;
 
-      // ✅ Если мы инициаторы, создаём offer
       if (isInitiator) {
         createOffer(socketId);
       }
@@ -257,11 +298,10 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
 
     initializeConference();
 
-    // Cleanup
     return () => {
       socketService.off();
       Object.values(peers.current).forEach((peer) => peer.close());
-      localStreamRef.current?.getTracks().forEach(track => track.stop());
+      localStreamRef.current?.getTracks().forEach((track) => track.stop());
       socketService.disconnect();
     };
   }, [roomId, socketUrl]);
@@ -291,7 +331,7 @@ const useConference = ({ roomId, socketUrl }: ConferenceProps) => {
     micOn,
     camOn,
     toggleTrack,
-    remoteStreams,
+    remoteStreams, // ✅ Теперь содержит nickname, avatarUrl, isGuest
   };
 };
 
