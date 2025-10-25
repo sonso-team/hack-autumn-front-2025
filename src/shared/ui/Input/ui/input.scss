@@ -16,15 +16,15 @@
     transform: translateY(-50%);
     position: absolute;
     font-size: 20px;
-    color: var(--white-50);
+    color: var(--dark-gray);
   }
   .input {
     height: 49px;
-    background-color: var(--dark-gray);
     box-shadow: 0 0 0 1px var(--light-gray);
     padding: 10px 15px;
     width: 100%;
     border-radius: 10px;
+    border: 1px solid black;
     font-size: 16px;
     line-height: 100%;
     color: var(--white);
@@ -39,8 +39,10 @@
   .input:focus + .label,
   .input:not(:placeholder-shown) + .label {
     transform: none;
-    font-size: 15px;
-    top: 2px;
+    font-size: 14px;
+    color: black;
+    top: -20px;
+    left: 2px;
   }
 
   &__error {
