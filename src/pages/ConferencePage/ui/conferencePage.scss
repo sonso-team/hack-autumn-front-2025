@@ -16,6 +16,18 @@
   overflow-y: scroll;
 }
 
+.ConferencePage__wrapper {
+  display: flex;
+  height: 100%;
+  margin: auto;
+}
+
+.ConferencePage__wrapper:has(.ConferencePage__chat) {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+}
+
 .ConferencePage__streamsContainer,
 .ConferencePage__grid {
   display: flex;
@@ -139,9 +151,9 @@
 }
 
 .ConferencePage__inviteTitle {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 500;
-  margin-bottom: 32px;
+  margin-bottom: 12px;
   line-height: 1.4;
 }
 

@@ -1,29 +1,36 @@
+// ConferenceFooter.tsx
 import { Button } from '../../../shared/ui/Button';
 import { icons } from '../../../shared/lib/icons';
 import './conferenceFooter.scss';
 import { Paragraph } from '../../../shared/ui/Paragraph';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 const ConferenceFooter = ({
   camToggle,
   micToggle,
   camOn,
   micOn,
-  onEndCall, // новый пропс для окончания конференции
+  onEndCall,
+  onToggleChat,
 }: {
   camToggle: () => void;
   micToggle: () => void;
   camOn: boolean;
   micOn: boolean;
   onEndCall: () => void;
+  onToggleChat: () => void;
 }) => {
   const navigate = useNavigate();
 
   const handleEndCall = () => {
     if (onEndCall) {
       onEndCall();
-    } // вызываем очистку конференции
-    navigate('/'); // переходим на домашнюю страницу
+    }
+    navigate('/');
+  };
+
+  const handleToggleChat = () => {
+    onToggleChat();
   };
 
   return (
@@ -34,7 +41,7 @@ const ConferenceFooter = ({
           color="gray"
         >
           <img
-            src={camOn ? icons.cam : icons.camOn}
+            src={camOn ? icons.camOn : icons.cam}
             alt=""
           />
         </Button>
@@ -43,30 +50,30 @@ const ConferenceFooter = ({
           color="gray"
         >
           <img
-            src={micOn ? icons.micro : icons.microOn}
+            src={micOn ? icons.microOn : icons.micro}
             alt=""
           />
         </Button>
       </div>
       <div className="conferenceFooter__rightSide">
         <Button
-          onClick={() => 1}
+          onClick={handleToggleChat}
           color="gray"
-          className="conferenceFooter__membersBtn"
         >
           <>
             <img
-              src={icons.members}
+              src={icons.chat}
               alt=""
             />
             <Paragraph
               mode="white"
               level={3}
             >
-              Участники
+              Чат
             </Paragraph>
           </>
         </Button>
+
         <Button
           onClick={handleEndCall}
           color="red"

@@ -4,7 +4,7 @@
   background-color: var(--almoust-black);
   border-radius: 16px;
   height: 100%;
-  max-height: 600px;
+  max-height: 72vh;
   width: 100%;
   max-width: 420px;
   overflow: hidden;
@@ -14,17 +14,28 @@
 }
 
 .chat-header {
-  padding: 16px;
+  padding: 16px 16px 16px 32px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background-color: var(--dark-dark-gray);
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 
   .heading {
     color: var(--light-gray);
     font-weight: 600;
   }
+}
+
+.chat-header > button {
+  background: none;
+  padding: 16px 12px;
+}
+
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .chat-body {
@@ -51,7 +62,7 @@
 .chat-footer {
   display: flex;
   align-items: center;
-  padding: 12px;
+  padding: 16px;
   background-color: var(--dark-dark-gray);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   gap: 8px;
