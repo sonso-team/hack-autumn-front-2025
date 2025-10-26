@@ -7,6 +7,7 @@ interface ParticipantVideoProps {
   avatarUrl?: string;
   isGuest?: boolean;
   isMuted?: boolean;
+  onStage?: (s: MediaStream) => void;
   onDoubleClickFullscreen?: boolean
 }
 
@@ -16,12 +17,16 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
   avatarUrl,
   isGuest,
   isMuted,
+  onStage,
   onDoubleClickFullscreen
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [status, setStatus] = useState<string>('⏳ Инициализация...');
 
-  const handleDblClick = () => {
+  const [stageOpen, setStageOpen] = useState(false);
+  const stageVideoRef = React.useRef<HTMLVideoElement | null>(null);
+
+const handleDblClick = () => {
   const el = videoRef.current;
   if (!el) {return;}
   if (document.fullscreenElement) {
@@ -111,7 +116,7 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
   }, [nickname]);
 
   return (
-    <div className="ParticipantVideo" onClick={handleDblClick} role='button' tabIndex={0}>
+    <div className="ParticipantVideo" onClick={() => onStage?.(stream)} onDoubleClick={handleDblClick} role='button' tabIndex={0}>
       <video
         key={stream.id} // при смене потока React создаст новый элемент
         ref={videoRef}
