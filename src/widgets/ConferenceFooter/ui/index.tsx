@@ -1,9 +1,9 @@
-// ConferenceFooter.tsx
-import { Button } from '../../../shared/ui/Button';
+import { MonitorUp, MonitorX } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { icons } from '../../../shared/lib/icons';
-import './conferenceFooter.scss';
+import { Button } from '../../../shared/ui/Button';
 import { Paragraph } from '../../../shared/ui/Paragraph';
-import { useNavigate } from 'react-router';
+import './conferenceFooter.scss';
 
 const ConferenceFooter = ({
   camToggle,
@@ -11,13 +11,19 @@ const ConferenceFooter = ({
   camOn,
   micOn,
   onEndCall,
-  onToggleChat,
+  onParticipantsOpen,
+  screenOn,
+  toggleScreen,
+  onToggleChat, // новый пропс для окончания конференции
 }: {
   camToggle: () => void;
   micToggle: () => void;
   camOn: boolean;
   micOn: boolean;
   onEndCall: () => void;
+  onParticipantsOpen: () => void;
+  screenOn: boolean;
+  toggleScreen: () => void;
   onToggleChat: () => void;
 }) => {
   const navigate = useNavigate();
@@ -56,6 +62,79 @@ const ConferenceFooter = ({
         </Button>
       </div>
       <div className="conferenceFooter__rightSide">
+        <Button
+          onClick={toggleScreen}
+          color="gray"
+        >
+          {screenOn ? (
+            <div className="str-but">
+              <MonitorX color="#fff" />
+              <Paragraph
+                mode="white"
+                level={3}
+              >
+                Прекратить демонстрацию
+              </Paragraph>
+            </div>
+          ) : (
+            <div className="str-but">
+              <MonitorUp color="#fff" />
+              <Paragraph
+                mode="white"
+                level={3}
+              >
+                Демонстрация экрана
+              </Paragraph>
+            </div>
+          )}
+        </Button>
+        <Button
+          onClick={toggleScreen}
+          color="gray"
+        >
+          {screenOn ? (
+            <div className="str-but">
+              <MonitorX color="#fff" />
+              <Paragraph
+                mode="white"
+                level={3}
+              >
+                Прекратить демонстрацию
+              </Paragraph>
+            </div>
+          ) : (
+            <div className="str-but">
+              <MonitorUp color="#fff" />
+              <Paragraph
+                mode="white"
+                level={3}
+              >
+                Демонстрация экрана
+              </Paragraph>
+            </div>
+          )}
+        </Button>
+        <Button
+          onClick={handleToggleChat}
+          color="gray"
+        >
+          <button
+            onClick={onParticipantsOpen}
+            className="parts"
+          >
+            <img
+              src={icons.chat}
+              alt=""
+            />
+            <Paragraph
+              mode="white"
+              level={3}
+            >
+              Чат
+            </Paragraph>
+          </button>
+        </Button>
+
         <Button
           onClick={handleToggleChat}
           color="gray"
