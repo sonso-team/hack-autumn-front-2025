@@ -1,23 +1,32 @@
+import ProfilePage from '@/pages/ProfilePage';
 import type { RouteObject } from 'react-router-dom';
-import ProtectedRoute from '../ui/ProtectedRoute';
 import MainLayout from '../../../../layouts/MainLayout';
 import AuthPage from '../../../../pages/AuthPage/ui';
 import ConferencePage from '../../../../pages/ConferencePage';
+import ProtectedRoute from '../ui/ProtectedRoute';
 import HomePage from '@/pages/HomePage';
+import WelcomePage from '../../../../pages/WelcomePage';
 
 const routes: RouteObject[] = [
   {
     element: <ProtectedRoute />,
     children: [
-      { path: '/lock', element: <h1>Страница с доступом по авторизации</h1> },
+      {
+        element: <MainLayout />,
+        children: [{ element: <HomePage />, path: '/*' }],
+      },
     ],
   },
   {
     element: <MainLayout />,
     children: [
       {
-        element: <HomePage />,
-        path: '/*',
+        element: <WelcomePage />,
+        path: '/home/*',
+      },
+      {
+        element: <ProfilePage />,
+        path: '/profile/*',
       },
       {
         element: <AuthPage />,

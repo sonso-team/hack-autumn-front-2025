@@ -11,7 +11,7 @@ import ParticipantVideo from '@/features/ParticipantVideo';
 
 const ConferencePage: React.FC = () => {
   const { pathname } = useLocation();
-
+  const { user } = useAppSelector((state) => state.authReducer);
   // ✅ Селектор имени и roomId вынесен в начало
   const { name: username, roomId } = useAppSelector(
     (state) => state.conferenceReducer,
@@ -56,7 +56,7 @@ const ConferencePage: React.FC = () => {
           />
           {/* Ник на локальном видео */}
           <div className="ConferencePage__nicknameOverlay">
-            {username || 'Гость'} (Вы)
+            {username || user?.nickname || 'Гость'} (Вы)
           </div>
         </div>
 

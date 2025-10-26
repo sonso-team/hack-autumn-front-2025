@@ -1,0 +1,26 @@
+@import '/src/shared/styles/base/Vars.scss';
+.pp {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 200px;
+  width: 209px;
+  height: 209px;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(327.01deg, #ff35eb 10.83%, #ffb8f8 81.98%);
+
+  h3 {
+    font-size: 100px;
+    color: #fff;
+  }
+}
+@media (max-width: $breakpoint-0) {
+  .pp {
+    width: 150px;
+    height: 150px;
+    h3 {
+      font-size: 80px;
+      color: #fff;
+    }
+  }
+}

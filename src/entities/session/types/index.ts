@@ -2,6 +2,10 @@ export interface IUser {
   id: string;
   email: string;
   name?: string;
+  nickname?: string;
+  createdAt?: string;
+  role?: string;
+  avatarPath?: string;
 }
 export interface IAuthResponse {
   user: IUser;

@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Heading } from '../../../shared/ui/Heading';
-import { useConfirmForm } from '../api';
 import { OtpInput } from '../../../features/OtpInput';
 import { Button } from '../../../shared/ui/Button';
+import { Heading } from '../../../shared/ui/Heading';
 import { Paragraph } from '../../../shared/ui/Paragraph';
+import { useConfirmForm } from '../api';
 
 const ConfirmForm = (props: {request: ({ password }: { password:string }) => void}) => {
   const { isValid, submitHandler, codeRef, setIsValid, getIsValid } =
@@ -27,9 +27,9 @@ const ConfirmForm = (props: {request: ({ password }: { password:string }) => voi
           Подтвердить почту
         </Button>
         <Paragraph level={4}>
-          Неправильный номер ?{' '}
+          Неправильная почта ?{' '}
           <Link
-            to="/auth/"
+            to="/home"
             className="AuthPage__link"
           >
             Назад
