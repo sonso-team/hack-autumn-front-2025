@@ -1,8 +1,7 @@
 .ConferencePage {
   display: flex;
   justify-content: space-between;
-  padding: 120px 30px;
-  overflow-y: scroll;
+  padding: 111px 32px 32px 32px;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -14,29 +13,38 @@
   flex-direction: column;
 }
 
-.ConferencePage__streamsContainer {
+.ConferencePage__streamsContainer,
+.ConferencePage__grid {
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   align-items: stretch;
-  gap: 40px;
+  gap: 24px;
   width: 100%;
-  max-width: 1200px;
+  margin: auto;
+  max-width: 1080px;
   transition: all 0.3s ease;
 }
 
-/* ==== Левая часть (видео) ==== */
 .ConferencePage__videoWrapper {
-  flex: 1;
+  flex: 1 1 auto;
+  aspect-ratio: 16 / 9;
   position: relative;
   border: 3px solid #ff6b00;
   border-radius: 16px;
   overflow: hidden;
   background: #000;
-  aspect-ratio: 16 / 9;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-width: 0;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.ConferencePage__videoWrapper:not(.ConferencePage__videoWrapper--self):hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 18px rgba(255, 107, 0, 0.5);
 }
 
 .ConferencePage__videoPlayer {
@@ -46,30 +54,62 @@
   display: block;
 }
 
-.ConferencePage__videoLabel {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 12px;
-  padding: 4px 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
+.ConferencePage__grid[data-count='1'] > *,
+.ConferencePage__grid[data-count='2'] > * {
+  flex: 1 1 calc(50% - 12px);
+  max-width: calc(50% - 12px);
 }
 
-.ConferencePage__micButton {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-size: 16px;
+.ConferencePage__grid[data-count='3'] > * {
+  flex: 1 1 calc(50% - 12px);
+  max-width: calc(50% - 12px);
+}
+.ConferencePage__grid[data-count='3'] > *:nth-child(3) {
+  flex: 1 1 100%;
+  max-width: 50%;
+  margin: 0 auto;
 }
 
-/* ==== Правая часть (инфо-блок) ==== */
+.ConferencePage__grid[data-count='4'] > * {
+  flex: 1 1 calc(50% - 12px);
+  max-width: calc(50% - 12px);
+}
+
+.ConferencePage__grid[data-count='5'] > *,
+.ConferencePage__grid[data-count='6'] > *,
+.ConferencePage__grid[data-count='7'] > *,
+.ConferencePage__grid[data-count='8'] > *,
+.ConferencePage__grid[data-count='9'] > * {
+  flex: 1 1 calc(33.333% - 24px);
+  max-width: calc(33.333% - 16px);
+}
+
+.ConferencePage__grid[data-count='10'] > *,
+.ConferencePage__grid[data-count='11'] > *,
+.ConferencePage__grid[data-count='12'] > *,
+.ConferencePage__grid[data-count='13'] > *,
+.ConferencePage__grid[data-count='14'] > *,
+.ConferencePage__grid[data-count='15'] > *,
+.ConferencePage__grid[data-count='16'] > *,
+.ConferencePage__grid[data-count='17'] > *,
+.ConferencePage__grid[data-count='18'] > *,
+.ConferencePage__grid[data-count='19'] > *,
+.ConferencePage__grid[data-count='20'] > * {
+  flex: 1 1 calc(25% - 9px);
+  max-width: calc(25% - 18px);
+}
+
+.ConferencePage__grid[data-count='16'] > *,
+.ConferencePage__grid[data-count='17'] > *,
+.ConferencePage__grid[data-count='18'] > *,
+.ConferencePage__grid[data-count='19'] > *,
+.ConferencePage__grid[data-count='20'] > * {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
 .ConferencePage__inviteBlock {
-  flex: 1;
+  flex: 1 1 auto;
   border: 2px solid #3a68ff;
   border-radius: 16px;
   background: #242338;
@@ -78,7 +118,6 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 40px 24px;
   aspect-ratio: 16 / 9;
   min-width: 0;
   box-sizing: border-box;
@@ -108,10 +147,10 @@
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s ease;
-}
 
-.ConferencePage__button:hover {
-  background: #45456a;
+  &:hover {
+    background: #45456a;
+  }
 }
 
 .ConferencePage__meetingId {
@@ -119,20 +158,27 @@
   color: #bbb;
 }
 
+.ConferencePage__streamsContainer:has(
+    > .ConferencePage__videoWrapper--self
+  ):has(> .ConferencePage__inviteBlock):not(:has(> .ParticipantVideo))
+  > .ConferencePage__videoWrapper--self,
+.ConferencePage__streamsContainer:has(
+    > .ConferencePage__videoWrapper--self
+  ):has(> .ConferencePage__inviteBlock):not(:has(> .ParticipantVideo))
+  > .ConferencePage__inviteBlock {
+  flex: 1 1 calc(50% - 12px);
+  max-width: calc(50% - 12px);
+}
+
 /* ==== 📱 Адаптив ==== */
 @media (max-width: 900px) {
-
-  .ConferencePage__streamsContainer {
-    flex-direction: column;
-    align-items: center;
-    gap: 24px;
+  .ConferencePage__grid {
+    justify-content: center;
   }
 
-  .ConferencePage__videoWrapper,
-  .ConferencePage__inviteBlock {
-    width: 100%;
-    max-width: 600px;
-    aspect-ratio: 16 / 9;
+  .ConferencePage__grid > * {
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 
   .ConferencePage__inviteBlock {
@@ -149,29 +195,3 @@
     padding: 8px 14px;
   }
 }
-
-/* ==== Сетка видеопотоков ==== */
-.ConferencePage__grid {
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 24px;
-}
-
-.ConferencePage__grid > * {
-  flex: 1 1 400px;
-  max-width: 600px;
-}
-
-/* ==== Адаптив ==== */
-@media (max-width: 900px) {
-  .ConferencePage__grid {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .ConferencePage__grid > * {
-    width: 100%;
-    max-width: 500px;
-  }
-}
-
