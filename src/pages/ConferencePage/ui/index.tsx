@@ -1,13 +1,14 @@
-import './conferencePage.scss';
-import React from 'react';
-import { useLocation } from 'react-router-dom';
-import { Paragraph } from '../../../shared/ui/Paragraph';
-import { Button } from '../../../shared/ui/Button';
-import copyCurrentUrl from '../../../shared/lib/copyCurrentPath';
-import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
 import { useConference } from '@/entities/conference';
-import ConferenceFooter from '@/widgets/ConferenceFooter';
 import ParticipantVideo from '@/features/ParticipantVideo';
+import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
+import ConferenceFooter from '@/widgets/ConferenceFooter';
+import ParticipantsPanel from '@/widgets/ParticipantsPanel/ui';
+import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import copyCurrentUrl from '../../../shared/lib/copyCurrentPath';
+import { Button } from '../../../shared/ui/Button';
+import { Paragraph } from '../../../shared/ui/Paragraph';
+import './conferencePage.scss';
 
 const ConferencePage: React.FC = () => {
   const { pathname } = useLocation();
@@ -38,6 +39,7 @@ const ConferencePage: React.FC = () => {
 
   const totalCount = 1 + remoteStreams.length;
 
+  const [open, setOpen] = useState(false);
   return (
     <main className="ConferencePage">
       <section
@@ -95,12 +97,26 @@ const ConferencePage: React.FC = () => {
         )}
       </section>
 
+{open && (
+        <div className="overlay" onClick={() => setOpen(false)}>
+          {/* стопаем клик внутри панели, чтобы не закрывалась */}
+          <div onClick={(e) => e.stopPropagation()}>
+            <ParticipantsPanel
+              roomId={roomId}
+              adminId={''}
+              onClose={() => setOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+
       <ConferenceFooter
         onEndCall={disconnect} // отключаем конференцию
         camToggle={() => toggleTrack('cam')}
         micToggle={() => toggleTrack('mic')}
         camOn={camOn}
         micOn={micOn}
+        onParticipantsOpen={() => setOpen(true)}
       />
     </main>
   );

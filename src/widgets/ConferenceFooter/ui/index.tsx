@@ -1,21 +1,23 @@
-import { Button } from '../../../shared/ui/Button';
-import { icons } from '../../../shared/lib/icons';
-import './conferenceFooter.scss';
-import { Paragraph } from '../../../shared/ui/Paragraph';
 import { useNavigate } from 'react-router-dom';
+import { icons } from '../../../shared/lib/icons';
+import { Button } from '../../../shared/ui/Button';
+import { Paragraph } from '../../../shared/ui/Paragraph';
+import './conferenceFooter.scss';
 
 const ConferenceFooter = ({
   camToggle,
   micToggle,
   camOn,
   micOn,
-  onEndCall, // новый пропс для окончания конференции
+  onEndCall,
+  onParticipantsOpen, // новый пропс для окончания конференции
 }: {
   camToggle: () => void;
   micToggle: () => void;
   camOn: boolean;
   micOn: boolean;
   onEndCall: () => void;
+  onParticipantsOpen: () => void;
 }) => {
   const navigate = useNavigate();
 
@@ -54,7 +56,7 @@ const ConferenceFooter = ({
           color="gray"
           className="conferenceFooter__membersBtn"
         >
-          <>
+          <button onClick={onParticipantsOpen} className='parts'>
             <img
               src={icons.members}
               alt=""
@@ -65,7 +67,7 @@ const ConferenceFooter = ({
             >
               Участники
             </Paragraph>
-          </>
+          </button>
         </Button>
         <Button
           onClick={handleEndCall}
