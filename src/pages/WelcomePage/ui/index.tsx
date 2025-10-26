@@ -15,10 +15,10 @@ const WelcomePage: React.FC = () => {
 
   useEffect(() => {
     const paths = window.location.pathname.split('/');
-    if (paths[paths.length - 1]) {
+    if (paths[paths.length - 1] && paths[paths.length - 1] !== 'home') {
       dispatch(setRoomId(paths[paths.length - 1]));
     } else {
-      navigate('/home');
+      navigate('/');
     }
   }, []);
 
