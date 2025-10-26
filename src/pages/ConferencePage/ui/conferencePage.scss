@@ -191,10 +191,6 @@
     width: 175px;
   }
 
-  .conferenceFooter {
-    row-gap: 8px;
-  }
-
   .conferenceFooter__rightSide {
     column-gap: 8px;
   }
@@ -246,8 +242,5 @@
   }
 
   .conferenceFooter {
-    position: absolute;
-    bottom: 32px;
-    justify-content: space-between;
   }
 }

@@ -1,6 +1,7 @@
 import { useConference } from '@/entities/conference';
 import ParticipantVideo from '@/features/ParticipantVideo';
 import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
+import { useMediaQuery } from '@/shared/lib/hooks/useMediaQuery';
 import ConferenceFooter from '@/widgets/ConferenceFooter';
 import ParticipantsPanel from '@/widgets/ParticipantsPanel/ui';
 import React, { useEffect, useState } from 'react';
@@ -60,6 +61,7 @@ const closeStage = () => setStageStream(null);
   const cameraStreams = remoteStreams.filter(s => !s.isScreen);
   const screenStreams = remoteStreams.filter(s => s.isScreen);
 
+  const isDesktop = useMediaQuery('(min-width: 800px)');
   return (
     <main className="ConferencePage">
       <section
@@ -160,7 +162,7 @@ const closeStage = () => setStageStream(null);
         micToggle={() => toggleTrack('mic')}
         camOn={camOn}
         micOn={micOn}
-        onParticipantsOpen={() => setOpen(true)} screenOn={screenOn} toggleScreen={toggleScreen}      />
+        onParticipantsOpen={() => setOpen(true)} screenOn={screenOn} toggleScreen={toggleScreen} isMobile={!isDesktop}      />
 
         {stageStream && (
   <div className="StageOverlay" onClick={closeStage}>

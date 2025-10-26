@@ -1,3 +1,5 @@
+@import '/src/shared/styles/base/Vars';
+
 .conferenceFooter {
   display: flex;
   row-gap: 20px;
@@ -37,4 +39,30 @@
 .str-but{
   display: flex;
   gap:8px;
+}
+
+@media (max-width: $breakpoint-3){
+  .conferenceFooter{
+    justify-content: center;
+    row-gap: 16px;
+    column-gap: 16px;
+    width: 90%;
+    flex-wrap: nowrap;
+  
+    &__leftSide,   &__rightSide{
+      display: contents;
+    }
+  }
+}
+@media (max-width: $breakpoint-5){
+  .conferenceFooter{
+    width:260px;
+    row-gap: 16px;
+    column-gap: 16px;
+    flex-wrap: wrap;
+  
+    &__leftSide,   &__rightSide{
+      display: contents;
+    }
+  }
 }
