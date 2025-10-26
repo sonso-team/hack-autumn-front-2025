@@ -14,7 +14,7 @@ const ConferenceFooter = ({
   onParticipantsOpen,
   screenOn,
   toggleScreen,
-  onToggleChat, // новый пропс для окончания конференции
+  onToggleChat,
 }: {
   camToggle: () => void;
   micToggle: () => void;
@@ -87,52 +87,6 @@ const ConferenceFooter = ({
               </Paragraph>
             </div>
           )}
-        </Button>
-        <Button
-          onClick={toggleScreen}
-          color="gray"
-        >
-          {screenOn ? (
-            <div className="str-but">
-              <MonitorX color="#fff" />
-              <Paragraph
-                mode="white"
-                level={3}
-              >
-                Прекратить демонстрацию
-              </Paragraph>
-            </div>
-          ) : (
-            <div className="str-but">
-              <MonitorUp color="#fff" />
-              <Paragraph
-                mode="white"
-                level={3}
-              >
-                Демонстрация экрана
-              </Paragraph>
-            </div>
-          )}
-        </Button>
-        <Button
-          onClick={handleToggleChat}
-          color="gray"
-        >
-          <button
-            onClick={onParticipantsOpen}
-            className="parts"
-          >
-            <img
-              src={icons.chat}
-              alt=""
-            />
-            <Paragraph
-              mode="white"
-              level={3}
-            >
-              Чат
-            </Paragraph>
-          </button>
         </Button>
 
         <Button

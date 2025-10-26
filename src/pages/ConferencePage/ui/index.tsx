@@ -35,7 +35,7 @@ const ConferencePage: React.FC = () => {
     camOn,
     screenOn,
     toggleScreen,
-    myScreenStream
+    myScreenStream,
   } = useConference({ roomId: getRoomId() });
 
   const [chatOpen, setChatOpen] = useState(false);
@@ -48,8 +48,8 @@ const ConferencePage: React.FC = () => {
   };
 
   const [open, setOpen] = useState(false);
-  const cameraStreams = remoteStreams.filter(s => !s.isScreen);
-  const screenStreams = remoteStreams.filter(s => s.isScreen);
+  const cameraStreams = remoteStreams.filter((s) => !s.isScreen);
+  const screenStreams = remoteStreams.filter((s) => s.isScreen);
 
   return (
     <main className="ConferencePage">
@@ -72,65 +72,67 @@ const ConferencePage: React.FC = () => {
             {username || user?.nickname || 'Гость'} (Вы)
           </div>
         </div>
-        
-        
-{screenOn && myScreenStream && (
-  <ParticipantVideo
-    key={myScreenStream.id}
-    stream={myScreenStream}
-    nickname={`Работает Ваш экран`}
-    avatarUrl={user?.avatarPath}
-    isMuted   // чтобы не ловить системный звук себя же
-  />
-)}
-        
-    
+
+        {screenOn && myScreenStream && (
+          <ParticipantVideo
+            key={myScreenStream.id}
+            stream={myScreenStream}
+            nickname={`Работает Ваш экран`}
+            avatarUrl={user?.avatarPath}
+            isMuted // чтобы не ловить системный звук себя же
+          />
+        )}
 
         {/* Видео других участников */}
 
-          {screenStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
-            <ParticipantVideo
-              key={stream.id} // ключ по stream.id, он уникальный на поток
-              stream={stream}
-              nickname={nickname}
-              isGuest={isGuest}
-              avatarUrl={avatarUrl}
-            />
-          ))}
+        {screenStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
+          <ParticipantVideo
+            key={stream.id} // ключ по stream.id, он уникальный на поток
+            stream={stream}
+            nickname={nickname}
+            isGuest={isGuest}
+            avatarUrl={avatarUrl}
+          />
+        ))}
 
-          {cameraStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
-            <ParticipantVideo
-              key={stream.id}
-              stream={stream}
-              nickname={nickname}
-              isGuest={isGuest}
-              avatarUrl={avatarUrl}
-            />
-          ))
-        }
-        
+        {cameraStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
+          <ParticipantVideo
+            key={stream.id}
+            stream={stream}
+            nickname={nickname}
+            isGuest={isGuest}
+            avatarUrl={avatarUrl}
+          />
+        ))}
+
         {!hasRemoteParticipants && (
-    <div className="ConferencePage__inviteBlock">
-      <Paragraph level={2} mode="white" className="ConferencePage__inviteTitle">
-        Пригласите других участников,
-        <br />
-        отправив им ссылку на встречу
-      </Paragraph>
-      <div className="ConferencePage__inviteButtons">
-        <Button
-          onClick={() => copyCurrentUrl(getRoomId())}
-          className="ConferencePage__button"
-        >
-          🔗 Копировать ссылку
-        </Button>
-      </div>
-    </div>
-  )}
-       
+          <div className="ConferencePage__inviteBlock">
+            <Paragraph
+              level={2}
+              mode="white"
+              className="ConferencePage__inviteTitle"
+            >
+              Пригласите других участников,
+              <br />
+              отправив им ссылку на встречу
+            </Paragraph>
+            <div className="ConferencePage__inviteButtons">
+              <Button
+                onClick={() => copyCurrentUrl(getRoomId())}
+                className="ConferencePage__button"
+              >
+                🔗 Копировать ссылку
+              </Button>
+            </div>
+          </div>
+        )}
       </section>
 
-{open && (
-        <div className="overlay" onClick={() => setOpen(false)}>
+      {open && (
+        <div
+          className="overlay"
+          onClick={() => setOpen(false)}
+        >
           {/* стопаем клик внутри панели, чтобы не закрывалась */}
           <div onClick={(e) => e.stopPropagation()}>
             <ParticipantsPanel
@@ -142,13 +144,23 @@ const ConferencePage: React.FC = () => {
         </div>
       )}
 
+      {chatOpen && (
+        <ChatWidget
+          roomId={getRoomId()}
+          closeHandler={chatCloseHandler}
+        />
+      )}
+
       <ConferenceFooter
         onEndCall={disconnect} // отключаем конференцию
         camToggle={() => toggleTrack('cam')}
         micToggle={() => toggleTrack('mic')}
         camOn={camOn}
         micOn={micOn}
-        onParticipantsOpen={() => setOpen(true)} screenOn={screenOn} toggleScreen={toggleScreen}        onToggleChat={() => setChatOpen((prev) => !prev)}
+        onParticipantsOpen={() => setOpen(true)}
+        screenOn={screenOn}
+        toggleScreen={toggleScreen}
+        onToggleChat={() => setChatOpen((prev) => !prev)}
       />
     </main>
   );

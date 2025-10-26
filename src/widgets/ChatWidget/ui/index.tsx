@@ -23,13 +23,13 @@ interface ClientEvent {
 
 interface ChatWidgetProps {
   baseUrl?: string;
-  confId?: string;
+  roomId?: string;
   closeHandler: () => void;
 }
 
 const ChatWidget: React.FC<ChatWidgetProps> = ({
   baseUrl = 'https://hack.kinoko.su',
-  confId = 'ed2d2f2d-ba9e-4f69-a62e-f5a31f68dc39',
+  roomId = 'ed2d2f2d-ba9e-4f69-a62e-f5a31f68dc39',
   closeHandler,
 }) => {
   const { user } = useAppSelector((state) => state.authReducer);
@@ -43,10 +43,10 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
 
   // создаём URL для подключения
   const connectUrl = useMemo(() => {
-    const path = `/ws/chat?conf=${confId}&`;
+    const path = `/ws/chat?conf=${roomId}&`;
     const query = `username=${encodeURIComponent(username)}`;
     return `${baseUrl}${path}${query}`;
-  }, [baseUrl, confId, username]);
+  }, [baseUrl, roomId, username]);
 
   // подключение к сокету
   const connect = () => {
