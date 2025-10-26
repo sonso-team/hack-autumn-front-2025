@@ -9,7 +9,9 @@ import ConfigForm from '../../../widgets/ConfigForm/ui';
 import { createRoom } from '../../../entities/conference';
 import { useAppDispatch } from '../../../shared/lib/hooks/useAppDispatch';
 import { connectRoom } from '../../../entities/conference/api/conferenceThunks';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import Message from '../../../shared/ui/Message/ui/index';
+import ChatNotifier from '@/shared/ui/ChatNotifier';
 
 const HomePage: React.FC = () => {
   const { showModal, hideModal } = useModal();
@@ -46,7 +48,7 @@ const HomePage: React.FC = () => {
 
   return (
     <main className="HomePage">
-      <div className="hp-container">
+      {/* <div className="hp-container">
         <ButtonGrande
           imgUrl={createMeetingImg}
           onClick={createMeetingHandler}
@@ -66,7 +68,23 @@ const HomePage: React.FC = () => {
             onClick={techWorksHandler}
           />
         </div>
-      </div>
+      </div> */}
+
+      <ChatNotifier
+        children={'Пользователь Иван присоединился к конференции'}
+      ></ChatNotifier>
+      <Message
+        type={'incoming'}
+        username={'Иван'}
+        time={'12:04'}
+        children={'Вы чо совсем ахуели???'}
+      ></Message>
+      <Message
+        type={'outgoing'}
+        username={'Иван'}
+        time={'12:04'}
+        children={'Вы чо совсем ахуели???'}
+      ></Message>
     </main>
   );
 };

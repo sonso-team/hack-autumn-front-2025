@@ -21,16 +21,16 @@ const Message: React.FC<MessageProps> = ({
         <Paragraph
           className="message-username"
           children={username}
-          level={4}
+          level={3}
         ></Paragraph>
         <Paragraph
           children={children}
-          level={4}
+          level={3}
         />
         <Paragraph
           className="message-time"
           children={time}
-          level={5}
+          level={3}
         ></Paragraph>
       </div>
     </div>
