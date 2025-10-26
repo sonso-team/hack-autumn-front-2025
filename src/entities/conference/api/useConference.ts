@@ -32,9 +32,8 @@ type PendingMap = Record<string, RTCIceCandidate[]>;
 const useConference = ({ roomId }: ConferenceProps) => {
   const localStreamRef = useRef<MediaStream | null>(null);
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
-
+  const { user } = useAppSelector((state) => state.authReducer);
   const { name: username } = useAppSelector((state) => state.conferenceReducer);
-  console.log(username);
 
   const peers = useRef<PeerConnectionMap>({});
   const pendingIce: React.MutableRefObject<PendingMap> = useRef({});
@@ -60,7 +59,7 @@ const useConference = ({ roomId }: ConferenceProps) => {
         localVideoRef.current.srcObject = stream;
       }
 
-      await socketService.connect(Endpoints.WS_URL, username);
+      await socketService.connect(Endpoints.WS_URL, username || user?.nickname);
 
       // Присоединяемся к комнате (roomId обязан быть не пустым)
       socketService.joinRoom(roomId || '');

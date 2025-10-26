@@ -6,4 +6,9 @@
   display: flex;
   justify-content: space-between;
   padding: 30px;
+  padding-bottom: 10px;
+  cursor: pointer;
+}
+.acc-butt:hover{
+  background-color: var(--accent-darker);
 }

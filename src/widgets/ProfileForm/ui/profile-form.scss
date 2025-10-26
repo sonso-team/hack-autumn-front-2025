@@ -1,0 +1,13 @@
+.ProfileForm {
+  width: 70%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 12px;
+  .link {
+    text-decoration: underline;
+    color: var(--accent);
+  }
+}

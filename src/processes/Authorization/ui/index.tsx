@@ -1,17 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import RegForm from '../../../widgets/RegForm/ui';
 import AuthForm from '../../../widgets/AuthForm/ui';
 import { useAppSelector } from '../../../shared/lib/hooks/useAppSelector';
 import { login, registration } from '../../../entities/session';
 import { useAppDispatch } from '../../../shared/lib/hooks/useAppDispatch';
-import { unmaskPhoneNumber } from '../../../shared/lib/format';
+
 import { authCode } from '../../../entities/session/api';
 import ConfirmForm from '../../../widgets/ConfirmForm/ui';
 import ConnectForm from '../../../widgets/ConnectForm/ui';
 
 const Authorization = () => {
-  const [goConfirm, setGoConfirm] = useState<boolean>(false);
   const [confirmStep, setConfirmStep] = useState(false);
   const { user } = useAppSelector((state) => state.authReducer);
   const location = useLocation();
