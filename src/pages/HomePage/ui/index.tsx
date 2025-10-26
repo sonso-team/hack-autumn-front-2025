@@ -4,6 +4,7 @@ import createEnterImg from '@/shared/assets/images/enter-meeting.png';
 import React from 'react';
 import './home-page.scss';
 import ButtonGrande from './shared/ButtonGrande/ui';
+import Message from '../../../shared/ui/Message/ui/index';
 
 const HomePage: React.FC = () => {
   return (

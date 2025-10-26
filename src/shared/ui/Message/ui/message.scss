@@ -1,0 +1,48 @@
+@use '../../../../shared/styles/base/Vars.scss' as var;
+
+.message-wrap {
+  display: flex;
+  width: 100%;
+  margin: 0;
+  
+}
+
+.message-wrap.incoming {
+  justify-content: flex-start;
+}
+
+.message-wrap.outgoing {
+  justify-content: flex-end;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 80%;
+  border-radius: 16px;
+  padding: 12px 12px 8px 12px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.message > p {
+  color: #fff;
+}
+
+.message-username {
+  color: var(--gray);
+}
+
+.message-wrap.incoming .message {
+  background-color: var(--dark-gray);
+  color: #fff;
+  align-items: flex-start;
+  border-radius: 16px 16px 16px 0;
+}
+
+.message-wrap.outgoing .message {
+  background-color: var(--gray);
+  align-items: flex-end;
+  border-radius: 16px 16px 0 16px;
+}
