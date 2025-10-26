@@ -65,7 +65,7 @@
   width: 100vw; height: 100vh;
   object-fit: contain;
   /* чтобы браузер сразу поднимал слой в композитор */
-  transform: translateZ(0); 
+  transform: translateZ(0);
 }
 
 .StageOverlay__close {

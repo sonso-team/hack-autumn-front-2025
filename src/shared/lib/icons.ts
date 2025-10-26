@@ -8,6 +8,7 @@ import microOnSVG from '@/shared/assets/icons/micOn.svg';
 import membersSVG from '@/shared/assets/icons/members.svg';
 import chatSVG from '@/shared/assets/icons/chat.svg';
 import phoneSVG from '@/shared/assets/icons/phone.svg';
+import crossSVG from '@/shared/assets/icons/x.svg';
 
 export const icons = {
   success: successSVG,
@@ -20,6 +21,7 @@ export const icons = {
   chat: chatSVG,
   members: membersSVG,
   phone: phoneSVG,
+  cross: crossSVG,
 };
 
 export type iconType = keyof typeof icons;
