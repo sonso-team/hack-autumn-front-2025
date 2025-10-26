@@ -1,11 +1,12 @@
+import HomePage from '@/pages/HomePage';
 import ProfilePage from '@/pages/ProfilePage';
+import { EnterConference } from '@/widgets/EnterConference';
 import type { RouteObject } from 'react-router-dom';
 import MainLayout from '../../../../layouts/MainLayout';
 import AuthPage from '../../../../pages/AuthPage/ui';
 import ConferencePage from '../../../../pages/ConferencePage';
-import ProtectedRoute from '../ui/ProtectedRoute';
-import HomePage from '@/pages/HomePage';
 import WelcomePage from '../../../../pages/WelcomePage';
+import ProtectedRoute from '../ui/ProtectedRoute';
 
 const routes: RouteObject[] = [
   {
@@ -35,6 +36,10 @@ const routes: RouteObject[] = [
       {
         element: <ConferencePage />,
         path: '/conference/*',
+      },
+      {
+        element: <EnterConference />,
+        path: '/conference/enter',
       },
     ],
   },
