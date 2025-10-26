@@ -1,2 +1,2 @@
-export {default as useConference} from './useConference';
-export {getLink} from './conferenceThunks'
+export { default as useConference } from './useConference';
+export { createRoom } from './conferenceThunks';

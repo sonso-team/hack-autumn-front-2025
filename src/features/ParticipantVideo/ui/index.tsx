@@ -51,16 +51,14 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
     if (tracks.length === 0) {
       setStatus('❌ В потоке нет треков');
     } else {
-      const info = tracks.map(
+      tracks.map(
         (t) => `${t.kind}: ${t.readyState} ${t.enabled ? '🟢' : '🔴'}`,
       );
-      console.log(`🎧 Tracks for ${nickname}:`, info);
     }
 
     // Обработчики событий потока
     const onInactive = () => setStatus('❌ Поток остановлен');
-    const onAddTrack = (e: any) => {
-      console.log('🎬 Добавлен трек:', e.track.kind);
+    const onAddTrack = () => {
       setStatus('🎬 Поток обновлён');
       tryPlay();
     };
@@ -82,11 +80,9 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
     }
 
     const onPlaying = () => {
-      console.log(`✅ Видео ${nickname} реально играет`);
       setStatus('✅ Видео реально играет');
     };
-    const onError = (e: any) => {
-      console.error('❌ Ошибка в видео:', e);
+    const onError = () => {
       setStatus('❌ Ошибка при воспроизведении');
     };
 

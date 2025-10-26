@@ -35,7 +35,6 @@ class SocketService {
     if (name) {
       this.name = name;
     }
-    console.log(name, this.name);
     return new Promise((resolve, reject) => {
       if (this.isConnected) {
         resolve();
@@ -49,7 +48,7 @@ class SocketService {
         heartbeatIncoming: 10000,
         heartbeatOutgoing: 10000,
 
-        onConnect: (frame) => {
+        onConnect: () => {
           this.isConnected = true;
           resolve();
         },
@@ -136,7 +135,6 @@ class SocketService {
     this.subscribeToRoomEvents(roomId);
 
     // ✅ Отправляем запрос на присоединение с userId или guestName
-    console.log(roomId, this.name);
     this.emit('join-room', {
       roomId,
       userId: userId || null,
@@ -151,8 +149,6 @@ class SocketService {
     if (!this.stompClient) {
       return;
     }
-
-    console.log(`📡 Подписка на события комнаты ${roomId}`);
 
     // ✅ Список участников (с данными)
     this.stompClient.subscribe(
