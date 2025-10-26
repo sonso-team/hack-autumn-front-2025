@@ -1,9 +1,10 @@
 import { useConference } from '@/entities/conference';
 import ParticipantVideo from '@/features/ParticipantVideo';
 import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
+import { useMediaQuery } from '@/shared/lib/hooks/useMediaQuery';
 import ConferenceFooter from '@/widgets/ConferenceFooter';
 import ParticipantsPanel from '@/widgets/ParticipantsPanel/ui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import copyCurrentUrl from '../../../shared/lib/copyCurrentPath';
 import { Button } from '../../../shared/ui/Button';
@@ -17,6 +18,20 @@ const ConferencePage: React.FC = () => {
   const { name: username, roomId } = useAppSelector(
     (state) => state.conferenceReducer,
   );
+
+
+  const [stageStream, setStageStream] = useState<MediaStream | null>(null);
+const stageVideoRef = React.useRef<HTMLVideoElement | null>(null);
+
+useEffect(() => {
+  const el = stageVideoRef.current;
+  if (!el) {return;}
+  el.srcObject = stageStream || null;         // без ререндера
+  if (stageStream) {el.play().catch(() => {});}
+}, [stageStream]);
+
+const closeStage = () => setStageStream(null);
+
 
   const getRoomId = () => {
     if (roomId) {
@@ -51,38 +66,43 @@ const ConferencePage: React.FC = () => {
   const cameraStreams = remoteStreams.filter((s) => !s.isScreen);
   const screenStreams = remoteStreams.filter((s) => s.isScreen);
 
+  const isDesktop = useMediaQuery('(min-width: 800px)');
   return (
     <main className="ConferencePage">
       <div className="ConferencePage__wrapper">
-        <section
-          className={`ConferencePage__streamsContainer ${
-            hasRemoteParticipants ? 'ConferencePage__grid' : ''
-          }`}
-          data-count={totalCount}
-        >
-          <div className="ConferencePage__videoWrapper ConferencePage__videoWrapper--self">
-            <video
-              ref={localVideoRef}
-              autoPlay
-              muted
-              playsInline
-              className="ConferencePage__videoPlayer"
-            />
-            {/* Ник на локальном видео */}
-            <div className="ConferencePage__nicknameOverlay">
-              {username || user?.nickname || 'Гость'} (Вы)
-            </div>
+      <section
+        className={`ConferencePage__streamsContainer ${
+          hasRemoteParticipants ? 'ConferencePage__grid' : ''
+        }`}
+        data-count={totalCount}
+      >
+        <div className="ConferencePage__videoWrapper ConferencePage__videoWrapper--self">
+          <video
+            ref={localVideoRef}
+            autoPlay
+            muted
+            playsInline
+            className="ConferencePage__videoPlayer"
+          />
+          {/* Ник на локальном видео */}
+          <div className="ConferencePage__nicknameOverlay">
+            {username || user?.nickname || 'Гость'} (Вы)
           </div>
-
-          {screenOn && myScreenStream && (
-            <ParticipantVideo
-              key={myScreenStream.id}
-              stream={myScreenStream}
-              nickname={`Работает Ваш экран`}
-              avatarUrl={user?.avatarPath}
-              isMuted // чтобы не ловить системный звук себя же
-            />
-          )}
+        </div>
+        
+        
+{screenOn && myScreenStream && (
+  <ParticipantVideo
+    key={myScreenStream.id}
+    stream={myScreenStream}
+    nickname={`Работает Ваш экран`}
+    avatarUrl={user?.avatarPath}
+    isMuted
+    onStage={setStageStream}   // чтобы не ловить системный звук себя же
+  />
+)}
+        
+    
 
           {/* Видео других участников */}
 
@@ -93,6 +113,7 @@ const ConferencePage: React.FC = () => {
               nickname={nickname}
               isGuest={isGuest}
               avatarUrl={avatarUrl}
+              onStage={setStageStream}
             />
           ))}
 
@@ -103,6 +124,7 @@ const ConferencePage: React.FC = () => {
               nickname={nickname}
               isGuest={isGuest}
               avatarUrl={avatarUrl}
+              onStage={setStageStream}
             />
           ))}
 
@@ -127,21 +149,16 @@ const ConferencePage: React.FC = () => {
               </div>
             </div>
           )}
-        </section>
-
+      </section>
         {chatOpen && (
           <ChatWidget
             roomId={getRoomId()}
             closeHandler={chatCloseHandler}
           />
-        )}
-      </div>
+        )}</div>
 
-      {open && (
-        <div
-          className="overlay"
-          onClick={() => setOpen(false)}
-        >
+{open && (
+        <div className="overlay" onClick={() => setOpen(false)}>
           {/* стопаем клик внутри панели, чтобы не закрывалась */}
           <div onClick={(e) => e.stopPropagation()}>
             <ParticipantsPanel
@@ -163,7 +180,22 @@ const ConferencePage: React.FC = () => {
         screenOn={screenOn}
         toggleScreen={toggleScreen}
         onToggleChat={() => setChatOpen((prev) => !prev)}
+        isMobile={!isDesktop}
       />
+
+        {stageStream && (
+  <div className="StageOverlay" onClick={closeStage}>
+    <video
+      ref={stageVideoRef}
+      autoPlay
+      playsInline
+      muted
+      className="StageOverlay__video"
+      onClick={(e) => e.stopPropagation()}
+    />
+    <button className="StageOverlay__close" onClick={closeStage}>✕</button>
+  </div>
+)}
     </main>
   );
 };

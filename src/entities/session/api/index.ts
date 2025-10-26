@@ -1,3 +1,5 @@
+import api from '@/shared/api/axios';
+import Endpoints from '@/shared/api/endpoints.ts';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { AxiosResponse } from 'axios';
 import type {
@@ -6,8 +8,6 @@ import type {
   IAuthResponse,
   IWhoAmIResponse,
 } from '../types';
-import Endpoints from '@/shared/api/endpoints.ts';
-import api from '@/shared/api/axios';
 
 const login = createAsyncThunk<
   IAuthResponse,
@@ -137,4 +137,6 @@ const getUser = createAsyncThunk<
   }
 });
 
-export { login, registration, logout, refresh, sendCode, authCode, getUser };
+
+export { authCode, getUser, login, logout, refresh, registration, sendCode };
+

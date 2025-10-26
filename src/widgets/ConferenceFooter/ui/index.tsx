@@ -15,6 +15,7 @@ const ConferenceFooter = ({
   screenOn,
   toggleScreen,
   onToggleChat,
+  isMobile,
 }: {
   camToggle: () => void;
   micToggle: () => void;
@@ -24,6 +25,7 @@ const ConferenceFooter = ({
   onParticipantsOpen: () => void;
   screenOn: boolean;
   toggleScreen: () => void;
+  isMobile: boolean;
   onToggleChat: () => void;
 }) => {
   const navigate = useNavigate();
@@ -69,12 +71,12 @@ const ConferenceFooter = ({
           {screenOn ? (
             <div className="str-but">
               <MonitorX color="#fff" />
-              <Paragraph
+              {!isMobile ?<Paragraph
                 mode="white"
                 level={3}
               >
                 Прекратить демонстрацию
-              </Paragraph>
+              </Paragraph> : null}
             </div>
           ) : (
             <div className="str-but">
@@ -88,7 +90,6 @@ const ConferenceFooter = ({
             </div>
           )}
         </Button>
-
         <Button
           onClick={handleToggleChat}
           color="gray"
@@ -98,18 +99,19 @@ const ConferenceFooter = ({
               src={icons.chat}
               alt=""
             />
-            <Paragraph
+            {!isMobile ? <Paragraph
               mode="white"
               level={3}
             >
               Чат
-            </Paragraph>
+            </Paragraph> : null}
           </>
         </Button>
 
         <Button
           onClick={handleEndCall}
           color="red"
+          className='hang'
         >
           <img
             src={icons.phone}

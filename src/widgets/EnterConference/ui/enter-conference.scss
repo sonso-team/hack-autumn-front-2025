@@ -1,0 +1,28 @@
+@import '/src/shared/styles/base/Vars';
+.enterconf{
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    align-items: center;
+    padding-top: 168px;
+    width: 50%;
+    gap: 24px;
+    h2{
+        margin-bottom: 32px;
+    }
+    .butts{
+        display: flex;
+        flex-direction: column;
+        gap:12px;
+        flex: 1;
+        
+    }
+    
+}
+
+@media (max-width: $breakpoint-5){
+  .butts{
+    width:100%;
+    align-self: center;
+  }
+}
