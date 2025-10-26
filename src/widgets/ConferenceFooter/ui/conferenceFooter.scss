@@ -25,3 +25,16 @@
     color: white;
   }
 }
+.parts{
+  display: flex;
+  gap: 8px;
+}
+.overlay{
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+}
+.str-but{
+  display: flex;
+  gap:8px;
+}
