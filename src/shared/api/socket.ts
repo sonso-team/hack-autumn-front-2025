@@ -2,8 +2,13 @@
 import type { IMessage } from '@stomp/stompjs';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { jwtDecode } from 'jwt-decode';
 
 type EventHandler = (data: any) => void;
+
+interface JwtPayload {
+  userId: string;
+}
 
 class SocketService {
   private static instance: SocketService;
@@ -12,6 +17,7 @@ class SocketService {
   private currentRoomId: string | null = null;
   private currentSessionId: string | null = null;
   private isConnected: boolean = false;
+  private name: string = 'Гость';
 
   private constructor() {}
 
@@ -25,46 +31,38 @@ class SocketService {
   /**
    * Подключение к WebSocket серверу через SockJS
    */
-  connect(serverUrl: string): Promise<void> {
+  connect(serverUrl: string, name: string): Promise<void> {
+    if (name) {
+      this.name = name;
+    }
+    console.log(name, this.name);
     return new Promise((resolve, reject) => {
       if (this.isConnected) {
-        console.log('✅ Уже подключено');
         resolve();
         return;
       }
 
-      console.log(`🔌 Подключаемся к: ${serverUrl}/ws/signaling`);
-
       this.stompClient = new Client({
         webSocketFactory: () => new SockJS(`${serverUrl}/ws/signaling`),
-
-        debug: (str: string) => {
-          console.log('🔍 STOMP:', str);
-        },
 
         reconnectDelay: 5000,
         heartbeatIncoming: 10000,
         heartbeatOutgoing: 10000,
 
         onConnect: (frame) => {
-          console.log('🟢 WebSocket подключен', frame);
           this.isConnected = true;
           resolve();
         },
 
         onDisconnect: () => {
-          console.log('🔴 WebSocket отключен');
           this.isConnected = false;
         },
 
         onStompError: (frame) => {
-          console.error('❌ STOMP error:', frame.headers['message']);
-          console.error('Error body:', frame.body);
           reject(new Error(frame.headers['message']));
         },
 
         onWebSocketError: (event) => {
-          console.error('❌ WebSocket error:', event);
           reject(event);
         },
       });
@@ -104,7 +102,6 @@ class SocketService {
     }
 
     const destination = this.getDestination(event);
-    console.log(`📤 Отправка [${event}] -> ${destination}:`, data);
 
     this.stompClient.publish({
       destination,
@@ -117,18 +114,34 @@ class SocketService {
    */
   joinRoom(roomId: string): void {
     if (!this.stompClient || !this.isConnected) {
-      console.error('❌ Сокет не подключен!');
       return;
     }
 
     this.currentRoomId = roomId;
-    console.log(`📥 Подключение к комнате: ${roomId}`);
+
+    // ✅ Определяем тип пользователя
+    const token = localStorage.getItem('token');
+    let userId: string | null = null;
+
+    if (token) {
+      try {
+        const decoded = jwtDecode<JwtPayload>(token);
+        userId = decoded.userId;
+      } catch (error) {
+        console.error('Ошибка декодирования токена:', error);
+      }
+    }
 
     // Подписываемся на события комнаты
     this.subscribeToRoomEvents(roomId);
 
-    // Отправляем запрос на присоединение
-    this.emit('join-room', { roomId });
+    // ✅ Отправляем запрос на присоединение с userId или guestName
+    console.log(roomId, this.name);
+    this.emit('join-room', {
+      roomId,
+      userId: userId || null,
+      guestName: this.name,
+    });
   }
 
   /**
@@ -141,81 +154,91 @@ class SocketService {
 
     console.log(`📡 Подписка на события комнаты ${roomId}`);
 
-    // Список участников - извлекаем sessionId из первого сообщения
-    this.stompClient.subscribe(`/topic/room/${roomId}/participants`, (message: IMessage) => {
-      const messageId = message.headers['message-id'];
+    // ✅ Список участников (с данными)
+    this.stompClient.subscribe(
+      `/topic/room/${roomId}/participants`,
+      (message: IMessage) => {
+        const messageId = message.headers['message-id'];
 
-      // Сохраняем session ID при первом получении
-      if (messageId && !this.currentSessionId) {
-        this.currentSessionId = messageId.split('-')[0];
-        console.log('💾 Extracted session ID:', this.currentSessionId);
+        // Сохраняем session ID при первом получении
+        if (messageId && !this.currentSessionId) {
+          this.currentSessionId = messageId.split('-')[0];
+          // Подписываемся на личные топики ПОСЛЕ получения sessionId
+          this.subscribeToPersonalTopics(roomId);
+        }
 
-        // Подписываемся на личные топики ПОСЛЕ получения sessionId
-        this.subscribeToPersonalTopics(roomId);
-      }
+        const data = JSON.parse(message.body);
 
-      console.log('📩 Получен список участников:', message.body);
-      const data = JSON.parse(message.body);
-      this.trigger('participants', data.participants);
-    });
+        // ✅ Теперь participants это массив ParticipantInfo
+        this.trigger('participants', data.participants);
+      },
+    );
 
     // Участник вышел
-    this.stompClient.subscribe(`/topic/room/${roomId}/user-left`, (message: IMessage) => {
-      console.log('📩 Участник вышел:', message.body);
-      const data = JSON.parse(message.body);
-      this.trigger('user-left', { socketId: data.socketId });
-    });
+    this.stompClient.subscribe(
+      `/topic/room/${roomId}/user-left`,
+      (message: IMessage) => {
+        const data = JSON.parse(message.body);
+        this.trigger('user-left', { socketId: data.socketId });
+      },
+    );
   }
 
   /**
    * Подписка на личные топики после получения sessionId
    */
   private subscribeToPersonalTopics(roomId: string): void {
-    if (!this.stompClient || !this.currentSessionId){
+    if (!this.stompClient || !this.currentSessionId) {
       return;
     }
 
     const sessionId = this.currentSessionId;
-    console.log(`📡 Подписка на личные топики для session ${sessionId}`);
 
-    // user-joined для этой сессии
+    // ✅ user-joined (с данными участника)
     this.stompClient.subscribe(
       `/topic/room/${roomId}/user-joined-${sessionId}`,
       (message: IMessage) => {
-        console.log('📩 Новый участник:', message.body);
         const data = JSON.parse(message.body);
-        this.trigger('user-joined', { socketId: data.socketId });
-      }
+
+        // ✅ Передаём все данные участника
+        this.trigger('user-joined', {
+          sessionId: data.sessionId,
+          userId: data.userId,
+          nickname: data.nickname,
+          avatarUrl: data.avatarUrl,
+          isGuest: data.isGuest,
+        });
+      },
     );
 
     // Offer
     this.stompClient.subscribe(
       `/topic/room/offer/${sessionId}`,
       (message: IMessage) => {
-        console.log('📩 Получен offer:', message.body);
         const data = JSON.parse(message.body);
         this.trigger('offer', { offer: data.offer, from: data.from });
-      }
+      },
     );
 
     // Answer
     this.stompClient.subscribe(
       `/topic/room/answer/${sessionId}`,
       (message: IMessage) => {
-        console.log('📩 Получен answer:', message.body);
         const data = JSON.parse(message.body);
         this.trigger('answer', { answer: data.answer, from: data.from });
-      }
+      },
     );
 
     // ICE Candidate
     this.stompClient.subscribe(
       `/topic/room/ice-candidate/${sessionId}`,
       (message: IMessage) => {
-        console.log('📩 Получен ICE candidate:', message.body);
         const data = JSON.parse(message.body);
-        this.trigger('ice-candidate', { candidate: data.candidate, from: data.from });
-      }
+        this.trigger('ice-candidate', {
+          candidate: data.candidate,
+          from: data.from,
+        });
+      },
     );
   }
 
@@ -225,8 +248,8 @@ class SocketService {
   private getDestination(event: string): string {
     const mapping: Record<string, string> = {
       'join-room': '/app/join-room',
-      'offer': '/app/offer',
-      'answer': '/app/answer',
+      offer: '/app/offer',
+      answer: '/app/answer',
       'ice-candidate': '/app/ice-candidate',
     };
     return mapping[event] || `/app/${event}`;
@@ -268,7 +291,6 @@ class SocketService {
       this.currentRoomId = null;
       this.currentSessionId = null;
       this.eventHandlers.clear();
-      console.log('👋 Сокет отключен');
     }
   }
 }

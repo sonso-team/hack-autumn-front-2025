@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch';
-import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
 import type { InputRef } from '../../../shared/ui/Input';
 import { hideLoader, showLoader } from '../../../entities/loader';
+import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch';
+import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
 
 export const useAuthForm = ({ request }) => {
   const dispatch = useAppDispatch();

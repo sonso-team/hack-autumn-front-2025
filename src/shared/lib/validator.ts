@@ -1,6 +1,3 @@
-import { login } from '../../entities/session';
-import { compile } from 'sass';
-
 const emailRegexp =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const cyrillicRegexp = /^[-а-яА-ЯёЁ\s]+$/;
@@ -48,8 +45,6 @@ const isEqualTo = (
   value: unknown,
   params: { compareValue: () => string },
 ): boolean => {
-  console.log("value", value);
-  console.log("compared", params);
   return value !== params.compareValue();
 };
 

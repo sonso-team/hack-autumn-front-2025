@@ -1,8 +1,12 @@
 .ConferencePage {
   display: flex;
-  justify-content: flex-end;
-  padding: 30px;
-  row-gap: 150px;
+  justify-content: space-between;
+  padding: 120px 30px;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  row-gap: 30px;
   align-items: center;
   height: 100vh;
   background: rgba(0, 0, 0, 0.86);
@@ -15,7 +19,7 @@
   justify-content: center;
   align-items: stretch;
   gap: 40px;
-  width: 90%;
+  width: 100%;
   max-width: 1200px;
   transition: all 0.3s ease;
 }
@@ -33,6 +37,18 @@
   justify-content: center;
   align-items: center;
   min-width: 0;
+}
+
+.ConferencePage__nicknameOverlay {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 14px;
+  pointer-events: none; // чтобы не мешало кликам
 }
 
 .ConferencePage__videoPlayer {
@@ -117,10 +133,6 @@
 
 /* ==== 📱 Адаптив ==== */
 @media (max-width: 900px) {
-  .ConferencePage {
-    height: auto;
-    padding: 40px 0;
-  }
 
   .ConferencePage__streamsContainer {
     flex-direction: column;
@@ -149,3 +161,29 @@
     padding: 8px 14px;
   }
 }
+
+/* ==== Сетка видеопотоков ==== */
+.ConferencePage__grid {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+}
+
+.ConferencePage__grid > * {
+  flex: 1 1 400px;
+  max-width: 600px;
+}
+
+/* ==== Адаптив ==== */
+@media (max-width: 900px) {
+  .ConferencePage__grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .ConferencePage__grid > * {
+    width: 100%;
+    max-width: 500px;
+  }
+}
+

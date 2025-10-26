@@ -1,9 +1,9 @@
-import { Heading } from '@/shared/ui/Heading';
-import { Input } from '@/shared/ui/Input';
+import { Link } from 'react-router-dom';
 import { useAuthForm } from '../api';
 import { Button } from '../../../shared/ui/Button';
 import { Paragraph } from '../../../shared/ui/Paragraph';
-import { Link } from 'react-router-dom';
+import { Heading } from '@/shared/ui/Heading';
+import { Input } from '@/shared/ui/Input';
 import './../../RegForm/ui/regForm.scss'
 
 const AuthForm = (props: {request: ({ email, password }: { email: string, password:string }) => void}) => {

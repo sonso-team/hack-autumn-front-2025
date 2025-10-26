@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
-import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
 import { Loader } from '../../../../entities/loader';
+import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
 
 const ProtectedRoute: React.FC = () => {
   const { isAuth, isLoading } = useAppSelector((state) => state.authReducer);

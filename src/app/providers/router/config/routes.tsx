@@ -1,10 +1,10 @@
-import HomePage from '@/pages/HomePage';
 import ProfilePage from '@/pages/ProfilePage';
 import type { RouteObject } from 'react-router-dom';
 import MainLayout from '../../../../layouts/MainLayout';
 import AuthPage from '../../../../pages/AuthPage/ui';
 import ConferencePage from '../../../../pages/ConferencePage';
 import ProtectedRoute from '../ui/ProtectedRoute';
+import HomePage from '@/pages/HomePage';
 
 const routes: RouteObject[] = [
   {
@@ -18,7 +18,7 @@ const routes: RouteObject[] = [
     children: [
       {
         element: <HomePage />,
-        index: true,
+        path: '/home',
       },
       {
         element: <ProfilePage />,
@@ -26,12 +26,12 @@ const routes: RouteObject[] = [
       },
       {
         element: <AuthPage />,
-        path: '/auth/*'
+        path: '/auth/*',
       },
       {
         element: <ConferencePage />,
-        path: '/conference/*'
-      }
+        path: '/conference/*',
+      },
     ],
   },
 ];
