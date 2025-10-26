@@ -70,39 +70,36 @@ const closeStage = () => setStageStream(null);
   return (
     <main className="ConferencePage">
       <div className="ConferencePage__wrapper">
-      <section
-        className={`ConferencePage__streamsContainer ${
-          hasRemoteParticipants ? 'ConferencePage__grid' : ''
-        }`}
-        data-count={totalCount}
-      >
-        <div className="ConferencePage__videoWrapper ConferencePage__videoWrapper--self">
-          <video
-            ref={localVideoRef}
-            autoPlay
-            muted
-            playsInline
-            className="ConferencePage__videoPlayer"
-          />
-          {/* Ник на локальном видео */}
-          <div className="ConferencePage__nicknameOverlay">
-            {username || user?.nickname || 'Гость'} (Вы)
+        <section
+          className={`ConferencePage__streamsContainer ${
+            hasRemoteParticipants ? 'ConferencePage__grid' : ''
+          }`}
+          data-count={totalCount}
+        >
+          <div className="ConferencePage__videoWrapper ConferencePage__videoWrapper--self">
+            <video
+              ref={localVideoRef}
+              autoPlay
+              muted
+              playsInline
+              className="ConferencePage__videoPlayer"
+            />
+            {/* Ник на локальном видео */}
+            <div className="ConferencePage__nicknameOverlay">
+              {username || user?.nickname || 'Гость'} (Вы)
+            </div>
           </div>
-        </div>
-        
-        
-{screenOn && myScreenStream && (
-  <ParticipantVideo
-    key={myScreenStream.id}
-    stream={myScreenStream}
-    nickname={`Работает Ваш экран`}
-    avatarUrl={user?.avatarPath}
-    isMuted
-    onStage={setStageStream}   // чтобы не ловить системный звук себя же
-  />
-)}
-        
-    
+
+          {screenOn && myScreenStream && (
+            <ParticipantVideo
+              key={myScreenStream.id}
+              stream={myScreenStream}
+              nickname={`Работает Ваш экран`}
+              avatarUrl={user?.avatarPath}
+              isMuted
+              onStage={setStageStream} // чтобы не ловить системный звук себя же
+            />
+          )}
 
           {/* Видео других участников */}
 
@@ -149,16 +146,20 @@ const closeStage = () => setStageStream(null);
               </div>
             </div>
           )}
-      </section>
+        </section>
         {chatOpen && (
           <ChatWidget
             roomId={getRoomId()}
             closeHandler={chatCloseHandler}
           />
-        )}</div>
+        )}
+      </div>
 
-{open && (
-        <div className="overlay" onClick={() => setOpen(false)}>
+      {open && (
+        <div
+          className="overlay"
+          onClick={() => setOpen(false)}
+        >
           {/* стопаем клик внутри панели, чтобы не закрывалась */}
           <div onClick={(e) => e.stopPropagation()}>
             <ParticipantsPanel
@@ -183,19 +184,27 @@ const closeStage = () => setStageStream(null);
         isMobile={!isDesktop}
       />
 
-        {stageStream && (
-  <div className="StageOverlay" onClick={closeStage}>
-    <video
-      ref={stageVideoRef}
-      autoPlay
-      playsInline
-      muted
-      className="StageOverlay__video"
-      onClick={(e) => e.stopPropagation()}
-    />
-    <button className="StageOverlay__close" onClick={closeStage}>✕</button>
-  </div>
-)}
+      {stageStream && (
+        <div
+          className="StageOverlay"
+          onClick={closeStage}
+        >
+          <video
+            ref={stageVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="StageOverlay__video"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            className="StageOverlay__close"
+            onClick={closeStage}
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </main>
   );
 };

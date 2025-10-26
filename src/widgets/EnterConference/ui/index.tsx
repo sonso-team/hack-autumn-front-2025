@@ -22,10 +22,7 @@ export const EnterConference = () => {
         return;
       }
       if (raw.startsWith('http') || raw.startsWith('hack')) {
-        const paths = window.location.pathname.split('/');
-        await dispatch(
-          connectRoom({ roomId: paths[paths.length - 1] }),
-        ).unwrap();
+        await dispatch(connectRoom({ roomId: val })).unwrap();
         navigate(raw);
       } else {
         const id = raw.match(/[a-z0-9-]{6,}/i)?.[0] ?? raw;
