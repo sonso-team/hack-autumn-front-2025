@@ -1,6 +1,6 @@
 import HomePage from '@/pages/HomePage';
 import ProfilePage from '@/pages/ProfilePage';
-import { EnterConference } from '@/widgets/EnterConference';
+import EnterConference from '@/widgets/EnterConference';
 import type { RouteObject } from 'react-router-dom';
 import MainLayout from '../../../../layouts/MainLayout';
 import AuthPage from '../../../../pages/AuthPage/ui';
