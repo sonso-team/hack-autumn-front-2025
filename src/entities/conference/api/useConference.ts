@@ -474,6 +474,7 @@ const toggleScreen = async () => {
     startScreenShare,
     stopScreenShare,
     toggleScreen,
+    myScreenStream: screenStreamRef.current,
   };
 };
 

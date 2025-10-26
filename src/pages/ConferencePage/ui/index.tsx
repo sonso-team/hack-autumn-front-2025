@@ -34,7 +34,8 @@ const ConferencePage: React.FC = () => {
     remoteStreams,
     camOn,
     screenOn,
-    toggleScreen
+    toggleScreen,
+    myScreenStream
   } = useConference({ roomId: getRoomId() });
 
   const hasRemoteParticipants = remoteStreams.length > 0;
@@ -68,6 +69,16 @@ const ConferencePage: React.FC = () => {
         </div>
         
         
+{screenOn && myScreenStream && (
+  <ParticipantVideo
+    stream={myScreenStream}
+    nickname={`Работает Ваш экран`}
+    isMuted   // чтобы не ловить системный звук себя же
+  />
+)}
+        
+    
+
         {/* Видео других участников */}
 
           {screenStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (

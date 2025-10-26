@@ -6,6 +6,7 @@ interface ParticipantVideoProps {
   nickname: string;
   avatarUrl?: string;
   isGuest?: boolean;
+  isMuted?: boolean;
 }
 
 const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
@@ -13,6 +14,7 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
   nickname,
   avatarUrl,
   isGuest,
+  isMuted
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [status, setStatus] = useState<string>('⏳ Инициализация...');
@@ -103,6 +105,7 @@ const ParticipantVideo: React.FC<ParticipantVideoProps> = ({
         autoPlay
         playsInline
         className="ParticipantVideo__player"
+        muted={isMuted}
       />
 
       <div className="ParticipantVideo__info">

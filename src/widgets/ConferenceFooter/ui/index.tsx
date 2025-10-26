@@ -1,3 +1,4 @@
+import { MonitorUp, MonitorX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { icons } from '../../../shared/lib/icons';
 import { Button } from '../../../shared/ui/Button';
@@ -57,17 +58,37 @@ const ConferenceFooter = ({
             alt=""
           />
         </Button>
+      </div>
+      <div className="conferenceFooter__rightSide">
         <Button
           onClick={toggleScreen}
           color="gray"
         >
-          <img
-            src={screenOn ? icons.micro : icons.microOn}
-            alt=""
-          />
+          {screenOn ? (
+            <div className='str-but'>
+              <MonitorX color='#fff'/>
+              <Paragraph
+                mode="white"
+                level={3}
+              >
+                Прекратить демонстрацию
+              </Paragraph>
+            </div>
+        ) : (
+          <div className='str-but'>
+            <MonitorUp color='#fff'/>
+            <Paragraph
+                  mode="white"
+                  level={3}
+                >
+                  
+                  Демонстрация экрана
+                </Paragraph>
+            </div>
+        )}
+          
+          
         </Button>
-      </div>
-      <div className="conferenceFooter__rightSide">
         <Button
           onClick={() => 1}
           color="gray"
