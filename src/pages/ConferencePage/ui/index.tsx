@@ -53,80 +53,89 @@ const ConferencePage: React.FC = () => {
 
   return (
     <main className="ConferencePage">
-      <section
-        className={`ConferencePage__streamsContainer ${
-          hasRemoteParticipants ? 'ConferencePage__grid' : ''
-        }`}
-        data-count={totalCount}
-      >
-        <div className="ConferencePage__videoWrapper ConferencePage__videoWrapper--self">
-          <video
-            ref={localVideoRef}
-            autoPlay
-            muted
-            playsInline
-            className="ConferencePage__videoPlayer"
-          />
-          {/* Ник на локальном видео */}
-          <div className="ConferencePage__nicknameOverlay">
-            {username || user?.nickname || 'Гость'} (Вы)
-          </div>
-        </div>
-
-        {screenOn && myScreenStream && (
-          <ParticipantVideo
-            key={myScreenStream.id}
-            stream={myScreenStream}
-            nickname={`Работает Ваш экран`}
-            avatarUrl={user?.avatarPath}
-            isMuted // чтобы не ловить системный звук себя же
-          />
-        )}
-
-        {/* Видео других участников */}
-
-        {screenStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
-          <ParticipantVideo
-            key={stream.id} // ключ по stream.id, он уникальный на поток
-            stream={stream}
-            nickname={nickname}
-            isGuest={isGuest}
-            avatarUrl={avatarUrl}
-          />
-        ))}
-
-        {cameraStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
-          <ParticipantVideo
-            key={stream.id}
-            stream={stream}
-            nickname={nickname}
-            isGuest={isGuest}
-            avatarUrl={avatarUrl}
-          />
-        ))}
-
-        {!hasRemoteParticipants && (
-          <div className="ConferencePage__inviteBlock">
-            <Paragraph
-              level={2}
-              mode="white"
-              className="ConferencePage__inviteTitle"
-            >
-              Пригласите других участников,
-              <br />
-              отправив им ссылку на встречу
-            </Paragraph>
-            <div className="ConferencePage__inviteButtons">
-              <Button
-                onClick={() => copyCurrentUrl(getRoomId())}
-                className="ConferencePage__button"
-              >
-                🔗 Копировать ссылку
-              </Button>
+      <div className="ConferencePage__wrapper">
+        <section
+          className={`ConferencePage__streamsContainer ${
+            hasRemoteParticipants ? 'ConferencePage__grid' : ''
+          }`}
+          data-count={totalCount}
+        >
+          <div className="ConferencePage__videoWrapper ConferencePage__videoWrapper--self">
+            <video
+              ref={localVideoRef}
+              autoPlay
+              muted
+              playsInline
+              className="ConferencePage__videoPlayer"
+            />
+            {/* Ник на локальном видео */}
+            <div className="ConferencePage__nicknameOverlay">
+              {username || user?.nickname || 'Гость'} (Вы)
             </div>
           </div>
+
+          {screenOn && myScreenStream && (
+            <ParticipantVideo
+              key={myScreenStream.id}
+              stream={myScreenStream}
+              nickname={`Работает Ваш экран`}
+              avatarUrl={user?.avatarPath}
+              isMuted // чтобы не ловить системный звук себя же
+            />
+          )}
+
+          {/* Видео других участников */}
+
+          {screenStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
+            <ParticipantVideo
+              key={stream.id} // ключ по stream.id, он уникальный на поток
+              stream={stream}
+              nickname={nickname}
+              isGuest={isGuest}
+              avatarUrl={avatarUrl}
+            />
+          ))}
+
+          {cameraStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
+            <ParticipantVideo
+              key={stream.id}
+              stream={stream}
+              nickname={nickname}
+              isGuest={isGuest}
+              avatarUrl={avatarUrl}
+            />
+          ))}
+
+          {!hasRemoteParticipants && (
+            <div className="ConferencePage__inviteBlock">
+              <Paragraph
+                level={2}
+                mode="white"
+                className="ConferencePage__inviteTitle"
+              >
+                Пригласите других участников,
+                <br />
+                отправив им ссылку на встречу
+              </Paragraph>
+              <div className="ConferencePage__inviteButtons">
+                <Button
+                  onClick={() => copyCurrentUrl(getRoomId())}
+                  className="ConferencePage__button"
+                >
+                  🔗 Копировать ссылку
+                </Button>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {chatOpen && (
+          <ChatWidget
+            roomId={getRoomId()}
+            closeHandler={chatCloseHandler}
+          />
         )}
-      </section>
+      </div>
 
       {open && (
         <div
@@ -142,13 +151,6 @@ const ConferencePage: React.FC = () => {
             />
           </div>
         </div>
-      )}
-
-      {chatOpen && (
-        <ChatWidget
-          roomId={getRoomId()}
-          closeHandler={chatCloseHandler}
-        />
       )}
 
       <ConferenceFooter
