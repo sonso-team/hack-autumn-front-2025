@@ -68,8 +68,6 @@ const useConference = ({ roomId }: ConferenceProps) => {
       socketService.on(
         'participants',
         async (participants: ParticipantInfo[]) => {
-          console.log('👥 Participants updated:', participants);
-
           const myId = socketService.id;
           participants.forEach((p) => {
             participantsData.current[p.sessionId] = p;
@@ -89,7 +87,6 @@ const useConference = ({ roomId }: ConferenceProps) => {
 
       // ===== User joined =====
       socketService.on('user-joined', async (participant: ParticipantInfo) => {
-        console.log('👤 User joined:', participant.nickname);
         participantsData.current[participant.sessionId] = participant;
 
         const myId = socketService.id;
@@ -112,7 +109,6 @@ const useConference = ({ roomId }: ConferenceProps) => {
           offer: RTCSessionDescriptionInit;
           from: string;
         }) => {
-          console.log('📩 Received offer from:', from);
           const pc = peers.current[from];
           if (!pc) {
             return;
@@ -129,16 +125,11 @@ const useConference = ({ roomId }: ConferenceProps) => {
 
           ignoreOffer.current[from] = !polite && offerCollision;
           if (ignoreOffer.current[from]) {
-            console.log('⚔️ Glare: impolite side ignoring offer from', from);
             return;
           }
 
           try {
             if (offerCollision) {
-              console.log(
-                '↩️ Glare: polite side rolling back before applying remote offer from',
-                from,
-              );
               await Promise.all([
                 pc.setLocalDescription({ type: 'rollback' }),
                 isSettingRemoteAnswerPending.current[from]
@@ -176,7 +167,6 @@ const useConference = ({ roomId }: ConferenceProps) => {
           answer: RTCSessionDescriptionInit;
           from: string;
         }) => {
-          console.log('📩 Received answer from:', from);
           const pc = peers.current[from];
           if (!pc) {
             return;
@@ -211,7 +201,6 @@ const useConference = ({ roomId }: ConferenceProps) => {
           candidate: RTCIceCandidateInit;
           from: string;
         }) => {
-          console.log('📩 Получен ICE candidate от:', from);
           const pc = peers.current[from];
           const ice = new RTCIceCandidate(candidate);
 
@@ -225,7 +214,6 @@ const useConference = ({ roomId }: ConferenceProps) => {
 
           try {
             await pc.addIceCandidate(ice);
-            console.log(`✅ Added ICE candidate from ${from}`);
           } catch (err) {
             console.error(`❌ Error adding ICE candidate from ${from}:`, err);
           }
@@ -234,8 +222,6 @@ const useConference = ({ roomId }: ConferenceProps) => {
 
       // ===== User left =====
       socketService.on('user-left', ({ socketId }: { socketId: string }) => {
-        console.log('👋 User left:', socketId);
-
         setRemoteStreams((prev) => prev.filter((r) => r.id !== socketId));
 
         if (peers.current[socketId]) {
@@ -288,7 +274,7 @@ const useConference = ({ roomId }: ConferenceProps) => {
       pc.onnegotiationneeded = async () => {
         try {
           makingOffer.current[remoteId] = true;
-          const polite = isPolite(myId, remoteId);
+          isPolite(myId, remoteId);
           // impolite не должен сам инициировать, если уже идёт процесс
           // но negotiationneeded триггерится честно — делаем offer, а в случае glare откатим
           const offer = await pc.createOffer();
@@ -343,9 +329,6 @@ const useConference = ({ roomId }: ConferenceProps) => {
       };
 
       pc.onconnectionstatechange = () => {
-        console.log(
-          `🔌 Connection state with ${remoteId}: ${pc.connectionState}`,
-        );
         if (['disconnected', 'failed', 'closed'].includes(pc.connectionState)) {
           setRemoteStreams((prev) => prev.filter((r) => r.id !== remoteId));
           pc.close();

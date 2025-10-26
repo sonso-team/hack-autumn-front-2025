@@ -8,6 +8,9 @@ const Endpoints = {
   AUTH_AUTH_CODE: '/api/auth/auth-code',
   AUTH_LOGOUT: '/api/auth/logout',
   AUTH_WHO_AM_I: '/api/auth/user-info',
+
+  CREATE_ROOM: '/api/rooms',
+  CONNECT_ROOM: '/api/rooms',
 };
 
 export default Endpoints;
