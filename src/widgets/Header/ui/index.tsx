@@ -1,14 +1,15 @@
 import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
+import { useMediaQuery } from '@/shared/lib/hooks/useMediaQuery';
 import { icons } from '@/shared/lib/icons';
 import { Button } from '@/shared/ui/Button';
 import { UserRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './header.scss';
-import { useEffect } from 'react';
 
 const Header = () => {
   const { user } = useAppSelector((state) => state.authReducer);
   const navigate = useNavigate();
+  const isDesktop = useMediaQuery('(min-width: 800px)');
   return (
     <header className="header">
       <img
@@ -22,7 +23,7 @@ const Header = () => {
           onClick={() => navigate('/profile')}
           className="acc-butt"
         >
-          <div
+          {isDesktop ? <div
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -36,7 +37,12 @@ const Header = () => {
               stroke="#fff"
             />
             Аккаунт
-          </div>
+          </div> : <UserRound
+              size={20}
+              fill="#fff"
+              stroke="#fff"
+            />}
+          
         </Button>
       ) : (
         <Button onClick={() => navigate('/auth/login')}>Войти в систему</Button>
