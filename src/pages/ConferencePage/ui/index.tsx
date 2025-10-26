@@ -1,14 +1,15 @@
 import './conferencePage.scss';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Paragraph } from '../../../shared/ui/Paragraph';
 import { Button } from '../../../shared/ui/Button';
+import copyCurrentUrl from '../../../shared/lib/copyCurrentPath';
 import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
 import { useConference } from '@/entities/conference';
 import ConferenceFooter from '@/widgets/ConferenceFooter';
 import ParticipantVideo from '@/features/ParticipantVideo';
-import copyCurrentUrl from '../../../shared/lib/copyCurrentPath';
 
-const ConferencePage = () => {
+const ConferencePage: React.FC = () => {
   const { pathname } = useLocation();
   const { user } = useAppSelector((state) => state.authReducer);
   // ✅ Селектор имени и roomId вынесен в начало
@@ -35,15 +36,17 @@ const ConferencePage = () => {
 
   const hasRemoteParticipants = remoteStreams.length > 0;
 
+  const totalCount = 1 + remoteStreams.length;
+
   return (
     <main className="ConferencePage">
       <section
         className={`ConferencePage__streamsContainer ${
           hasRemoteParticipants ? 'ConferencePage__grid' : ''
         }`}
+        data-count={totalCount}
       >
-        {/* Локальное видео */}
-        <div className="ConferencePage__videoWrapper">
+        <div className="ConferencePage__videoWrapper ConferencePage__videoWrapper--self">
           <video
             ref={localVideoRef}
             autoPlay
