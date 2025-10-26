@@ -50,6 +50,7 @@ const useConference = ({ roomId }: ConferenceProps) => {
   const [camOn, setCamOn] = useState(true);
 
   const screenStreamRef = useRef<MediaStream | null>(null);
+  const [myScreenStream, setMyScreenStream] = useState<MediaStream | null>(null);
   const [screenOn, setScreenOn] = useState(false);
 
 // на каждого пира нужен список отправителей экранных треков — чтобы потом удалить
@@ -64,6 +65,8 @@ const useConference = ({ roomId }: ConferenceProps) => {
     });
 
     screenStreamRef.current = displayStream;
+    setMyScreenStream(displayStream);     // ⬅️ важный момент: в state
+    setScreenOn(true);
 
     // Вешаем все треки экрана на все активные peer connections
     Object.entries(peers.current).forEach(([peerId, pc]) => {
@@ -80,32 +83,43 @@ const useConference = ({ roomId }: ConferenceProps) => {
       t.addEventListener('ended', () => stopScreenShare());
     });
 
-    setScreenOn(true);
   } catch (e) {
     console.error('getDisplayMedia error', e);
   }
 };
 
-const stopScreenShare = () => {
-  if (!screenStreamRef.current) {return;}
+const attachStreamEndCleanup = (remoteId: string, s: MediaStream) => {
+  const cleanupIfEnded = () => {
+    const allEnded = s.getTracks().every((t) => t.readyState === 'ended');
+    if (allEnded) {
+      setRemoteStreams((prev) => prev.filter((x) => x.stream.id !== s.id));
+    }
+  };
+  s.addEventListener?.('removetrack', cleanupIfEnded);
+  s.getTracks().forEach((t) => t.addEventListener('ended', cleanupIfEnded));
+};
 
-  // 1) Удаляем экранные треки из каждого PC
+
+const stopScreenShare = () => {
+  const s = screenStreamRef.current;
+  if (!s) {return;}
+
+  // a) удалить sender'ы у всех PC
   Object.entries(peers.current).forEach(([peerId, pc]) => {
     const senders = screenSenders.current[peerId] || [];
-    senders.forEach((sender) => {
-      try {
-        pc.removeTrack(sender);
-      } catch { /* empty */ }
-    });
+    senders.forEach((sender) => { try { pc.removeTrack(sender); } catch { /* empty */ } });
     delete screenSenders.current[peerId];
   });
 
-  // 2) Гасим локальные треки экрана
-  screenStreamRef.current.getTracks().forEach((t) => t.stop());
+  // b) остановить треки и закрыть ссылку
+  s.getTracks().forEach((t) => t.stop());
   screenStreamRef.current = null;
 
+  // c) снести превью
+  setMyScreenStream(null);
   setScreenOn(false);
 };
+
 
 const toggleScreen = async () => {
   if (screenOn) {stopScreenShare();}
@@ -335,6 +349,18 @@ const toggleScreen = async () => {
         ?.getTracks()
         .forEach((t) => pc.addTrack(t, localStreamRef.current!));
 
+        // если уже шарим экран — добавим его и сюда
+if (screenOn && screenStreamRef.current) {
+  const displayStream = screenStreamRef.current;
+  const senders: RTCRtpSender[] = [];
+  displayStream.getTracks().forEach((track) => {
+    const sender = pc.addTrack(track, displayStream);
+    senders.push(sender);
+  });
+  screenSenders.current[remoteId] = senders;
+}
+
+
       // perfect negotiation — инициируем offer только через negotiationneeded
       pc.onnegotiationneeded = async () => {
         try {
@@ -397,15 +423,17 @@ const toggleScreen = async () => {
       },
     ];
   });
+  attachStreamEndCleanup(remoteId, remoteStream);
+
       };
 
       pc.onconnectionstatechange = () => {
-        if (['disconnected', 'failed', 'closed'].includes(pc.connectionState)) {
-          setRemoteStreams((prev) => prev.filter((r) => r.id !== remoteId));
-          pc.close();
-          delete peers.current[remoteId];
-        }
-      };
+  if (['disconnected', 'failed', 'closed'].includes(pc.connectionState)) {
+    setRemoteStreams((prev) => prev.filter((r) => !r.id.startsWith(`${remoteId}:`)));
+    pc.close();
+    delete peers.current[remoteId];
+  }
+};
 
       peers.current[remoteId] = pc;
       return pc;
@@ -432,6 +460,7 @@ const toggleScreen = async () => {
     screenStreamRef.current.getTracks().forEach((t) => t.stop());
     screenStreamRef.current = null;
   }
+      stopScreenShare();
       socketService.disconnect();
     };
   }, [roomId]);
@@ -474,7 +503,7 @@ const toggleScreen = async () => {
     startScreenShare,
     stopScreenShare,
     toggleScreen,
-    myScreenStream: screenStreamRef.current,
+    myScreenStream,
   };
 };
 

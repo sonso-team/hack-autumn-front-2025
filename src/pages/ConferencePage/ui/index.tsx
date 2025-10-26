@@ -71,8 +71,10 @@ const ConferencePage: React.FC = () => {
         
 {screenOn && myScreenStream && (
   <ParticipantVideo
+    key={myScreenStream.id}
     stream={myScreenStream}
     nickname={`Работает Ваш экран`}
+    avatarUrl={user?.avatarPath}
     isMuted   // чтобы не ловить системный звук себя же
   />
 )}
