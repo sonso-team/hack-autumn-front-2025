@@ -1,15 +1,15 @@
-import React from 'react';
 import createAppointmentsImg from '@/shared/assets/images/appointments.png';
 import createMeetingImg from '@/shared/assets/images/create-meeting.png';
 import createEnterImg from '@/shared/assets/images/enter-meeting.png';
-import './home-page.scss';
-import ButtonGrande from './shared/ButtonGrande/ui';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createRoom } from '../../../entities/conference';
+import { connectRoom } from '../../../entities/conference/api/conferenceThunks';
+import { useAppDispatch } from '../../../shared/lib/hooks/useAppDispatch';
 import { useModal } from '../../../shared/lib/hooks/useModal';
 import ConfigForm from '../../../widgets/ConfigForm/ui';
-import { createRoom } from '../../../entities/conference';
-import { useAppDispatch } from '../../../shared/lib/hooks/useAppDispatch';
-import { connectRoom } from '../../../entities/conference/api/conferenceThunks';
-import { useNavigate } from 'react-router-dom';
+import './home-page.scss';
+import ButtonGrande from './shared/ButtonGrande/ui';
 
 const HomePage: React.FC = () => {
   const { showModal, hideModal } = useModal();
@@ -44,6 +44,10 @@ const HomePage: React.FC = () => {
     });
   };
 
+  const connectButtonHandler = () => {
+    navigate('/conference/enter');
+  }
+
   return (
     <main className="HomePage">
       <div className="hp-container">
@@ -57,7 +61,7 @@ const HomePage: React.FC = () => {
             imgUrl={createEnterImg}
             bottomText={'Подключиться'}
             className="smol"
-            onClick={techWorksHandler}
+            onClick={connectButtonHandler}
           />
           <ButtonGrande
             imgUrl={createAppointmentsImg}
