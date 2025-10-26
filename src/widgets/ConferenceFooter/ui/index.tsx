@@ -13,7 +13,8 @@ const ConferenceFooter = ({
   onEndCall,
   onParticipantsOpen,
   screenOn,
-  toggleScreen, // новый пропс для окончания конференции
+  toggleScreen,
+  onToggleChat,
   isMobile,
 }: {
   camToggle: () => void;
@@ -25,18 +26,19 @@ const ConferenceFooter = ({
   screenOn: boolean;
   toggleScreen: () => void;
   isMobile: boolean;
+  onToggleChat: () => void;
 }) => {
   const navigate = useNavigate();
-
-  
-
-
 
   const handleEndCall = () => {
     if (onEndCall) {
       onEndCall();
-    } // вызываем очистку конференции
-    navigate('/'); // переходим на домашнюю страницу
+    }
+    navigate('/');
+  };
+
+  const handleToggleChat = () => {
+    onToggleChat();
   };
 
   return (
@@ -47,7 +49,7 @@ const ConferenceFooter = ({
           color="gray"
         >
           <img
-            src={camOn ? icons.cam : icons.camOn}
+            src={camOn ? icons.camOn : icons.cam}
             alt=""
           />
         </Button>
@@ -56,7 +58,7 @@ const ConferenceFooter = ({
           color="gray"
         >
           <img
-            src={micOn ? icons.micro : icons.microOn}
+            src={micOn ? icons.microOn : icons.micro}
             alt=""
           />
         </Button>
@@ -67,52 +69,49 @@ const ConferenceFooter = ({
           color="gray"
         >
           {screenOn ? (
-            <div className='str-but'>
-              <MonitorX color='#fff'/>
-              {!isMobile ? <Paragraph
+            <div className="str-but">
+              <MonitorX color="#fff" />
+              {!isMobile ?<Paragraph
                 mode="white"
                 level={3}
               >
                 Прекратить демонстрацию
-              </Paragraph> : (null)}
+              </Paragraph> : null}
             </div>
-        ) : (
-          <div className='str-but'>
-            <MonitorUp color='#fff'/>
-            {!isMobile ? 
-            <Paragraph
-                  mode="white"
-                  level={3}
-                >
-                  
-                  Демонстрация экрана
-                </Paragraph>: (null)}
+          ) : (
+            <div className="str-but">
+              <MonitorUp color="#fff" />
+              <Paragraph
+                mode="white"
+                level={3}
+              >
+                Демонстрация экрана
+              </Paragraph>
             </div>
-        )}
-          
-          
+          )}
         </Button>
         <Button
-          onClick={() => 1}
+          onClick={handleToggleChat}
           color="gray"
-          className="conferenceFooter__membersBtn"
         >
-          <button onClick={onParticipantsOpen} className='parts'>
+          <>
             <img
-              src={icons.members}
+              src={icons.chat}
               alt=""
             />
             {!isMobile ? <Paragraph
               mode="white"
               level={3}
             >
-              Участники
-            </Paragraph> : (null)}
-          </button>
+              Чат
+            </Paragraph> : null}
+          </>
         </Button>
+
         <Button
           onClick={handleEndCall}
-          color="red" className='hang'
+          color="red"
+          className='hang'
         >
           <img
             src={icons.phone}

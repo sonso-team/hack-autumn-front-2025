@@ -10,11 +10,11 @@ import copyCurrentUrl from '../../../shared/lib/copyCurrentPath';
 import { Button } from '../../../shared/ui/Button';
 import { Paragraph } from '../../../shared/ui/Paragraph';
 import './conferencePage.scss';
+import ChatWidget from '@/widgets/ChatWidget';
 
 const ConferencePage: React.FC = () => {
   const { pathname } = useLocation();
   const { user } = useAppSelector((state) => state.authReducer);
-  // ✅ Селектор имени и roomId вынесен в начало
   const { name: username, roomId } = useAppSelector(
     (state) => state.conferenceReducer,
   );
@@ -50,55 +50,58 @@ const closeStage = () => setStageStream(null);
     camOn,
     screenOn,
     toggleScreen,
-    myScreenStream
+    myScreenStream,
   } = useConference({ roomId: getRoomId() });
 
-  const hasRemoteParticipants = remoteStreams.length > 0;
+  const [chatOpen, setChatOpen] = useState(false);
 
+  const hasRemoteParticipants = remoteStreams.length > 0;
   const totalCount = 1 + remoteStreams.length;
 
+  const chatCloseHandler = () => {
+    setChatOpen(false);
+  };
+
   const [open, setOpen] = useState(false);
-  const cameraStreams = remoteStreams.filter(s => !s.isScreen);
-  const screenStreams = remoteStreams.filter(s => s.isScreen);
+  const cameraStreams = remoteStreams.filter((s) => !s.isScreen);
+  const screenStreams = remoteStreams.filter((s) => s.isScreen);
 
   const isDesktop = useMediaQuery('(min-width: 800px)');
   return (
     <main className="ConferencePage">
-      <section
-        className={`ConferencePage__streamsContainer ${
-          hasRemoteParticipants ? 'ConferencePage__grid' : ''
-        }`}
-        data-count={totalCount}
-      >
-        <div className="ConferencePage__videoWrapper ConferencePage__videoWrapper--self">
-          <video
-            ref={localVideoRef}
-            autoPlay
-            muted
-            playsInline
-            className="ConferencePage__videoPlayer"
-          />
-          {/* Ник на локальном видео */}
-          <div className="ConferencePage__nicknameOverlay">
-            {username || user?.nickname || 'Гость'} (Вы)
+      <div className="ConferencePage__wrapper">
+        <section
+          className={`ConferencePage__streamsContainer ${
+            hasRemoteParticipants ? 'ConferencePage__grid' : ''
+          }`}
+          data-count={totalCount}
+        >
+          <div className="ConferencePage__videoWrapper ConferencePage__videoWrapper--self">
+            <video
+              ref={localVideoRef}
+              autoPlay
+              muted
+              playsInline
+              className="ConferencePage__videoPlayer"
+            />
+            {/* Ник на локальном видео */}
+            <div className="ConferencePage__nicknameOverlay">
+              {username || user?.nickname || 'Гость'} (Вы)
+            </div>
           </div>
-        </div>
-        
-        
-{screenOn && myScreenStream && (
-  <ParticipantVideo
-    key={myScreenStream.id}
-    stream={myScreenStream}
-    nickname={`Работает Ваш экран`}
-    avatarUrl={user?.avatarPath}
-    isMuted
-    onStage={setStageStream}   // чтобы не ловить системный звук себя же
-  />
-)}
-        
-    
 
-        {/* Видео других участников */}
+          {screenOn && myScreenStream && (
+            <ParticipantVideo
+              key={myScreenStream.id}
+              stream={myScreenStream}
+              nickname={`Работает Ваш экран`}
+              avatarUrl={user?.avatarPath}
+              isMuted
+              onStage={setStageStream} // чтобы не ловить системный звук себя же
+            />
+          )}
+
+          {/* Видео других участников */}
 
           {screenStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
             <ParticipantVideo
@@ -120,31 +123,43 @@ const closeStage = () => setStageStream(null);
               avatarUrl={avatarUrl}
               onStage={setStageStream}
             />
-          ))
-        }
-        
-        {!hasRemoteParticipants && (
-    <div className="ConferencePage__inviteBlock">
-      <Paragraph level={2} mode="white" className="ConferencePage__inviteTitle">
-        Пригласите других участников,
-        <br />
-        отправив им ссылку на встречу
-      </Paragraph>
-      <div className="ConferencePage__inviteButtons">
-        <Button
-          onClick={() => copyCurrentUrl(getRoomId())}
-          className="ConferencePage__button"
-        >
-          🔗 Копировать ссылку
-        </Button>
-      </div>
-    </div>
-  )}
-       
-      </section>
+          ))}
 
-{open && (
-        <div className="overlay" onClick={() => setOpen(false)}>
+          {!hasRemoteParticipants && (
+            <div className="ConferencePage__inviteBlock">
+              <Paragraph
+                level={2}
+                mode="white"
+                className="ConferencePage__inviteTitle"
+              >
+                Пригласите других участников,
+                <br />
+                отправив им ссылку на встречу
+              </Paragraph>
+              <div className="ConferencePage__inviteButtons">
+                <Button
+                  onClick={() => copyCurrentUrl(getRoomId())}
+                  className="ConferencePage__button"
+                >
+                  🔗 Копировать ссылку
+                </Button>
+              </div>
+            </div>
+          )}
+        </section>
+        {chatOpen && (
+          <ChatWidget
+            roomId={getRoomId()}
+            closeHandler={chatCloseHandler}
+          />
+        )}
+      </div>
+
+      {open && (
+        <div
+          className="overlay"
+          onClick={() => setOpen(false)}
+        >
           {/* стопаем клик внутри панели, чтобы не закрывалась */}
           <div onClick={(e) => e.stopPropagation()}>
             <ParticipantsPanel
@@ -162,21 +177,34 @@ const closeStage = () => setStageStream(null);
         micToggle={() => toggleTrack('mic')}
         camOn={camOn}
         micOn={micOn}
-        onParticipantsOpen={() => setOpen(true)} screenOn={screenOn} toggleScreen={toggleScreen} isMobile={!isDesktop}      />
+        onParticipantsOpen={() => setOpen(true)}
+        screenOn={screenOn}
+        toggleScreen={toggleScreen}
+        onToggleChat={() => setChatOpen((prev) => !prev)}
+        isMobile={!isDesktop}
+      />
 
-        {stageStream && (
-  <div className="StageOverlay" onClick={closeStage}>
-    <video
-      ref={stageVideoRef}
-      autoPlay
-      playsInline
-      muted
-      className="StageOverlay__video"
-      onClick={(e) => e.stopPropagation()}
-    />
-    <button className="StageOverlay__close" onClick={closeStage}>✕</button>
-  </div>
-)}
+      {stageStream && (
+        <div
+          className="StageOverlay"
+          onClick={closeStage}
+        >
+          <video
+            ref={stageVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="StageOverlay__video"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            className="StageOverlay__close"
+            onClick={closeStage}
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </main>
   );
 };

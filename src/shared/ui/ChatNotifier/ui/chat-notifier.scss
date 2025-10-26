@@ -1,0 +1,10 @@
+.notifier-wrap {
+  display: flex;
+  width: 100%;
+  margin: 0;
+}
+
+.notifier > p {
+    color: var(--gray);
+    padding: 24px;
+}
