@@ -5,24 +5,28 @@ import AuthPage from '../../../../pages/AuthPage/ui';
 import ConferencePage from '../../../../pages/ConferencePage';
 import ProtectedRoute from '../ui/ProtectedRoute';
 import HomePage from '@/pages/HomePage';
+import WelcomePage from '../../../../pages/WelcomePage';
 
 const routes: RouteObject[] = [
   {
     element: <ProtectedRoute />,
     children: [
-      { path: '/lock', element: <h1>Страница с доступом по авторизации</h1> },
+      {
+        element: <MainLayout />,
+        children: [{ element: <HomePage />, path: '/*' }],
+      },
     ],
   },
   {
     element: <MainLayout />,
     children: [
       {
-        element: <HomePage />,
-        path: '/home',
+        element: <WelcomePage />,
+        path: '/home/*',
       },
       {
         element: <ProfilePage />,
-        path: '/profile/*'
+        path: '/profile/*',
       },
       {
         element: <AuthPage />,
