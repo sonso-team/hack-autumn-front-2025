@@ -10,7 +10,9 @@ const ConferenceFooter = ({
   camOn,
   micOn,
   onEndCall,
-  onParticipantsOpen, // новый пропс для окончания конференции
+  onParticipantsOpen,
+  screenOn,
+  toggleScreen, // новый пропс для окончания конференции
 }: {
   camToggle: () => void;
   micToggle: () => void;
@@ -18,8 +20,14 @@ const ConferenceFooter = ({
   micOn: boolean;
   onEndCall: () => void;
   onParticipantsOpen: () => void;
+  screenOn: boolean;
+  toggleScreen: () => void;
 }) => {
   const navigate = useNavigate();
+
+  
+
+
 
   const handleEndCall = () => {
     if (onEndCall) {
@@ -46,6 +54,15 @@ const ConferenceFooter = ({
         >
           <img
             src={micOn ? icons.micro : icons.microOn}
+            alt=""
+          />
+        </Button>
+        <Button
+          onClick={toggleScreen}
+          color="gray"
+        >
+          <img
+            src={screenOn ? icons.micro : icons.microOn}
             alt=""
           />
         </Button>

@@ -1,8 +1,8 @@
 // src/entities/conference/api/index.ts
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { socketService } from '../../../shared/api/socket';
 import Endpoints from '../../../shared/api/endpoints';
+import { socketService } from '../../../shared/api/socket';
 import { useAppSelector } from '../../../shared/lib/hooks/useAppSelector';
 
 interface ConferenceProps {
@@ -25,6 +25,7 @@ interface RemoteStream {
   nickname: string;
   avatarUrl: string | null;
   isGuest: boolean;
+  isScreen?: boolean;
 }
 
 type PendingMap = Record<string, RTCIceCandidate[]>;
@@ -47,6 +48,70 @@ const useConference = ({ roomId }: ConferenceProps) => {
   const [remoteStreams, setRemoteStreams] = useState<RemoteStream[]>([]);
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
+
+  const screenStreamRef = useRef<MediaStream | null>(null);
+  const [screenOn, setScreenOn] = useState(false);
+
+// на каждого пира нужен список отправителей экранных треков — чтобы потом удалить
+  const screenSenders = useRef<Record<string, RTCRtpSender[]>>({});
+
+  const startScreenShare = async (withSystemAudio = false) => {
+  if (screenOn) {return;}
+  try {
+    const displayStream = await navigator.mediaDevices.getDisplayMedia({
+      video: { frameRate: 30 },   // можешь поднять/опустить
+      audio: withSystemAudio,     // true — если хочешь шарить системный звук (браузер/ОС могут ограничить)
+    });
+
+    screenStreamRef.current = displayStream;
+
+    // Вешаем все треки экрана на все активные peer connections
+    Object.entries(peers.current).forEach(([peerId, pc]) => {
+      const senders: RTCRtpSender[] = [];
+      displayStream.getTracks().forEach((track) => {
+        const sender = pc.addTrack(track, displayStream);
+        senders.push(sender);
+      });
+      screenSenders.current[peerId] = senders;
+    });
+
+    // автозавершение, когда пользователь нажал «Stop sharing» в UI браузера
+    displayStream.getVideoTracks().forEach((t) => {
+      t.addEventListener('ended', () => stopScreenShare());
+    });
+
+    setScreenOn(true);
+  } catch (e) {
+    console.error('getDisplayMedia error', e);
+  }
+};
+
+const stopScreenShare = () => {
+  if (!screenStreamRef.current) {return;}
+
+  // 1) Удаляем экранные треки из каждого PC
+  Object.entries(peers.current).forEach(([peerId, pc]) => {
+    const senders = screenSenders.current[peerId] || [];
+    senders.forEach((sender) => {
+      try {
+        pc.removeTrack(sender);
+      } catch { /* empty */ }
+    });
+    delete screenSenders.current[peerId];
+  });
+
+  // 2) Гасим локальные треки экрана
+  screenStreamRef.current.getTracks().forEach((t) => t.stop());
+  screenStreamRef.current = null;
+
+  setScreenOn(false);
+};
+
+const toggleScreen = async () => {
+  if (screenOn) {stopScreenShare();}
+  else {await startScreenShare(false);} // или true — если хочешь тащить системный звук
+};
+
 
   useEffect(() => {
     const initializeConference = async () => {
@@ -222,7 +287,7 @@ const useConference = ({ roomId }: ConferenceProps) => {
 
       // ===== User left =====
       socketService.on('user-left', ({ socketId }: { socketId: string }) => {
-        setRemoteStreams((prev) => prev.filter((r) => r.id !== socketId));
+        setRemoteStreams((prev) => prev.filter((r) => !r.id.startsWith(`${socketId}:`)));
 
         if (peers.current[socketId]) {
           peers.current[socketId].ontrack = null;
@@ -310,22 +375,28 @@ const useConference = ({ roomId }: ConferenceProps) => {
           return;
         }
 
+          const maybeScreen = remoteStream.getVideoTracks().some((vt) => {
+    const lbl = (vt.label || '').toLowerCase();
+    return lbl.includes('screen') || lbl.includes('window') || lbl.includes('display');
+  });
+
         setRemoteStreams((prev) => {
-          const exists = prev.find((s) => s.id === remoteId);
-          if (exists) {
-            return prev;
-          }
-          return [
-            ...prev,
-            {
-              id: remoteId,
-              stream: remoteStream,
-              nickname: info.nickname,
-              avatarUrl: info.avatarUrl,
-              isGuest: info.isGuest,
-            },
-          ];
-        });
+    // уникальность — по stream.id, а не по участнику
+    const exists = prev.some((s) => s.stream.id === remoteStream.id);
+    if (exists) {return prev;}
+
+    return [
+      ...prev,
+      {
+        id: `${remoteId}:${remoteStream.id}`, // уникальный идентификатор элемента списка
+        stream: remoteStream,
+        nickname: info.nickname,
+        avatarUrl: info.avatarUrl,
+        isGuest: info.isGuest,
+        isScreen: maybeScreen,
+      },
+    ];
+  });
       };
 
       pc.onconnectionstatechange = () => {
@@ -356,6 +427,11 @@ const useConference = ({ roomId }: ConferenceProps) => {
       Object.values(peers.current).forEach((pc) => pc.close());
       peers.current = {};
       localStreamRef.current?.getTracks().forEach((t) => t.stop());
+      // экраны тоже выключим
+  if (screenStreamRef.current) {
+    screenStreamRef.current.getTracks().forEach((t) => t.stop());
+    screenStreamRef.current = null;
+  }
       socketService.disconnect();
     };
   }, [roomId]);
@@ -394,6 +470,10 @@ const useConference = ({ roomId }: ConferenceProps) => {
     toggleTrack,
     remoteStreams,
     disconnect,
+    screenOn,
+    startScreenShare,
+    stopScreenShare,
+    toggleScreen,
   };
 };
 

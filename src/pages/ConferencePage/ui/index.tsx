@@ -33,6 +33,8 @@ const ConferencePage: React.FC = () => {
     micOn,
     remoteStreams,
     camOn,
+    screenOn,
+    toggleScreen
   } = useConference({ roomId: getRoomId() });
 
   const hasRemoteParticipants = remoteStreams.length > 0;
@@ -40,6 +42,9 @@ const ConferencePage: React.FC = () => {
   const totalCount = 1 + remoteStreams.length;
 
   const [open, setOpen] = useState(false);
+  const cameraStreams = remoteStreams.filter(s => !s.isScreen);
+  const screenStreams = remoteStreams.filter(s => s.isScreen);
+
   return (
     <main className="ConferencePage">
       <section
@@ -61,40 +66,49 @@ const ConferencePage: React.FC = () => {
             {username || user?.nickname || 'Гость'} (Вы)
           </div>
         </div>
-
+        
+        
         {/* Видео других участников */}
-        {hasRemoteParticipants ? (
-          remoteStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
+
+          {screenStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
             <ParticipantVideo
-              key={id}
+              key={stream.id} // ключ по stream.id, он уникальный на поток
+              stream={stream}
+              nickname={nickname}
+              isGuest={isGuest}
+              avatarUrl={avatarUrl}
+            />
+          ))}
+
+          {cameraStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
+            <ParticipantVideo
+              key={stream.id}
               stream={stream}
               nickname={nickname}
               isGuest={isGuest}
               avatarUrl={avatarUrl}
             />
           ))
-        ) : (
-          // Заглушка, если участников нет
-          <div className="ConferencePage__inviteBlock">
-            <Paragraph
-              level={2}
-              mode="white"
-              className="ConferencePage__inviteTitle"
-            >
-              Пригласите других участников,
-              <br />
-              отправив им ссылку на встречу
-            </Paragraph>
-            <div className="ConferencePage__inviteButtons">
-              <Button
-                onClick={() => copyCurrentUrl(getRoomId())}
-                className="ConferencePage__button"
-              >
-                🔗 Копировать ссылку
-              </Button>
-            </div>
-          </div>
-        )}
+        }
+        
+        {!hasRemoteParticipants && (
+    <div className="ConferencePage__inviteBlock">
+      <Paragraph level={2} mode="white" className="ConferencePage__inviteTitle">
+        Пригласите других участников,
+        <br />
+        отправив им ссылку на встречу
+      </Paragraph>
+      <div className="ConferencePage__inviteButtons">
+        <Button
+          onClick={() => copyCurrentUrl(getRoomId())}
+          className="ConferencePage__button"
+        >
+          🔗 Копировать ссылку
+        </Button>
+      </div>
+    </div>
+  )}
+       
       </section>
 
 {open && (
@@ -116,8 +130,7 @@ const ConferencePage: React.FC = () => {
         micToggle={() => toggleTrack('mic')}
         camOn={camOn}
         micOn={micOn}
-        onParticipantsOpen={() => setOpen(true)}
-      />
+        onParticipantsOpen={() => setOpen(true)} screenOn={screenOn} toggleScreen={toggleScreen}      />
     </main>
   );
 };
