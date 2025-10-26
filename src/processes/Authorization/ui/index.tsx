@@ -8,6 +8,7 @@ import { useAppDispatch } from '../../../shared/lib/hooks/useAppDispatch';
 import { unmaskPhoneNumber } from '../../../shared/lib/format';
 import { authCode } from '../../../entities/session/api';
 import ConfirmForm from '../../../widgets/ConfirmForm/ui';
+import ConnectForm from '../../../widgets/ConnectForm/ui';
 
 const Authorization = () => {
   const [goConfirm, setGoConfirm] = useState<boolean>(false);
@@ -54,6 +55,9 @@ const Authorization = () => {
   }
   if (location.pathname === '/auth/login') {
     return <AuthForm request={loginSubmit} />;
+  }
+  if (location.pathname === '/auth/connect') {
+    return <ConnectForm />;
   }
 
   return <RegForm request={regSubmit} />;

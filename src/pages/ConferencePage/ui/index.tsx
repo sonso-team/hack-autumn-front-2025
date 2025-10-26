@@ -11,7 +11,11 @@ import ParticipantVideo from '@/features/ParticipantVideo';
 
 const ConferencePage: React.FC = () => {
   const { pathname } = useLocation();
-  const { roomId } = useAppSelector((state) => state.conferenceReducer);
+
+  // ✅ Селектор имени и roomId вынесен в начало
+  const { name: username, roomId } = useAppSelector(
+    (state) => state.conferenceReducer,
+  );
 
   const getRoomId = () => {
     if (roomId) {
@@ -21,8 +25,14 @@ const ConferencePage: React.FC = () => {
     return paths[paths.length - 1];
   };
 
-  const { localVideoRef, toggleTrack, micOn, remoteStreams, camOn } =
-    useConference({ roomId: getRoomId() });
+  const {
+    localVideoRef,
+    toggleTrack,
+    disconnect,
+    micOn,
+    remoteStreams,
+    camOn,
+  } = useConference({ roomId: getRoomId() });
 
   const hasRemoteParticipants = remoteStreams.length > 0;
 
@@ -44,9 +54,13 @@ const ConferencePage: React.FC = () => {
             playsInline
             className="ConferencePage__videoPlayer"
           />
+          {/* Ник на локальном видео */}
+          <div className="ConferencePage__nicknameOverlay">
+            {username || 'Гость'} (Вы)
+          </div>
         </div>
 
-        {/* Если есть участники — показываем их */}
+        {/* Видео других участников */}
         {hasRemoteParticipants ? (
           remoteStreams.map(({ id, stream, nickname, isGuest, avatarUrl }) => (
             <ParticipantVideo
@@ -58,6 +72,7 @@ const ConferencePage: React.FC = () => {
             />
           ))
         ) : (
+          // Заглушка, если участников нет
           <div className="ConferencePage__inviteBlock">
             <Paragraph
               level={2}
@@ -70,7 +85,7 @@ const ConferencePage: React.FC = () => {
             </Paragraph>
             <div className="ConferencePage__inviteButtons">
               <Button
-                onClick={copyCurrentUrl}
+                onClick={() => copyCurrentUrl(getRoomId())}
                 className="ConferencePage__button"
               >
                 🔗 Копировать ссылку
@@ -81,6 +96,7 @@ const ConferencePage: React.FC = () => {
       </section>
 
       <ConferenceFooter
+        onEndCall={disconnect} // отключаем конференцию
         camToggle={() => toggleTrack('cam')}
         micToggle={() => toggleTrack('mic')}
         camOn={camOn}

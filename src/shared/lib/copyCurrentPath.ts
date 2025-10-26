@@ -1,6 +1,6 @@
-const copyCurrentUrl = async () => {
+const copyCurrentUrl = async (roomId: string) => {
   try {
-    await navigator.clipboard.writeText(window.location.href);
+    await navigator.clipboard.writeText(`${window.location.host}/${roomId}`);
   } catch (err) {
     console.error(err);
   }
