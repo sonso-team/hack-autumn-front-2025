@@ -1,11 +1,13 @@
 export interface IConferenceData {
   roomId?: string;
+  name?: string;
+  type?: string;
+  description?: string;
+  accessCode?: string;
+  maxParticipants?: number;
 }
 
-export interface IConferenceResponse {
-  roomId?: string;
-  message?: string;
-}
+export type IConferenceResponse = string;
 
 export interface IConferenceState {
   roomId?: string;

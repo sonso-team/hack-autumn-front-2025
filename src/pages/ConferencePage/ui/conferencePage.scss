@@ -1,4 +1,4 @@
-@use '@/shared/styles/base/Vars.scss' as var;
+@import '/src/shared/styles/base/Vars';
 
 .ConferencePage {
   display: flex;
@@ -13,6 +13,7 @@
   background: rgba(0, 0, 0, 0.86);
   box-sizing: border-box;
   flex-direction: column;
+  overflow-y: scroll;
 }
 
 .ConferencePage__streamsContainer,
@@ -185,13 +186,9 @@
 }
 
 /* ==== 📱 Адаптив ==== */
-@media (max-width: var.$breakpoint-3) {
+@media (max-width: $breakpoint-3) {
   .header > img {
     width: 175px;
-  }
-
-  .ConferencePage {
-    overflow-y: scroll;
   }
 
   .conferenceFooter {

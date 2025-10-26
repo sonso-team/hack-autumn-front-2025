@@ -41,7 +41,7 @@ export const Modal = React.forwardRef<HTMLDialogElement, ModalPropsI>(
                   alt={icon}
                 />
               )}
-              <Heading level={2}>{title}</Heading>
+              <Heading level={1}>{title}</Heading>
               {body && typeof body === 'string' ? (
                 <Paragraph level={2}>{body}</Paragraph>
               ) : (
@@ -50,6 +50,7 @@ export const Modal = React.forwardRef<HTMLDialogElement, ModalPropsI>(
               <div className="modal__buttons">
                 <Button
                   onClick={primaryHandler}
+                  color="default"
                   custom
                 >
                   {primaryText}
@@ -58,6 +59,7 @@ export const Modal = React.forwardRef<HTMLDialogElement, ModalPropsI>(
                   <Button
                     onClick={secondaryHandler}
                     style="secondary"
+                    color="default"
                     custom
                   >
                     {secondaryText}

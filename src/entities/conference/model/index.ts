@@ -1,7 +1,7 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import type { IConferenceState, IConferenceResponse } from '../types';
-import { getLink } from '../api/conferenceThunks';
+import { connectRoom, createRoom } from '../api/conferenceThunks';
 
 const initialState: IConferenceState = {
   isError: false,
@@ -25,24 +25,33 @@ const conferenceSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getLink.pending, (state) => {
+      .addCase(createRoom.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
         state.message = null;
       })
       .addCase(
-        getLink.fulfilled,
+        createRoom.fulfilled,
         (state, action: PayloadAction<IConferenceResponse>) => {
           state.isError = false;
-          state.message = action.payload.message;
-          state.roomId = action.payload.roomId;
+          state.roomId = action.payload;
           state.isLoading = false;
         },
       )
-      .addCase(getLink.rejected, (state, action) => {
+      .addCase(createRoom.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
-        state.message = action.payload?.message || 'Something went wrong';
+      })
+      .addCase(connectRoom.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.message = null;
+      })
+      .addCase(connectRoom.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(connectRoom.rejected, (state) => {
+        state.isLoading = false;
       });
   },
 });

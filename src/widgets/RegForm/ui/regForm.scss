@@ -11,6 +11,14 @@
     row-gap: 24px;
   }
 
+  &__buttons {
+    display: flex;
+    column-gap: 10px;
+    button {
+      flex-grow: 1;
+    }
+  }
+
   &__inputs {
     display: flex;
     flex-direction: column;
