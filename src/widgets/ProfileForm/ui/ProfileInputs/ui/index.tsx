@@ -7,6 +7,7 @@ import { Input } from "@/shared/ui/Input";
 import { Paragraph } from "@/shared/ui/Paragraph";
 import { DeleteAccountModal } from "@/widgets/ProfileForm/DeleteAccountModal";
 import { useNavigate } from "react-router-dom";
+import './profile-inputs.scss';
 
 export const ProfileInputs = ({ setPasswords }: { setPasswords: () => void }) => {
   const dispatch = useAppDispatch();

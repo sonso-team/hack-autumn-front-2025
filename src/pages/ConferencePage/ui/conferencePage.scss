@@ -255,18 +255,21 @@
     aspect-ratio: 1 / 1;
   }
 
-  .conferenceFooter {
-  }
 }
 
 
 @media (max-width: $breakpoint-4) {
   .ConferencePage {
-    overflow-x: hidden;
-  }
+  min-height: 100svh;          /* честная высота на мобилках */
+  overflow: auto;              /* скролл всей страницы */
+  padding-bottom: 172px;       /* запас под фикс-панель (подгони под свою высоту) */
+  /* остальное оставь как есть */
+}
 
   .conferenceFooter .conferenceFooter__rightSide {
+    
     flex-wrap: wrap;
     gap: 8px;
   }
+  
 }

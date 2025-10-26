@@ -2,6 +2,7 @@ import { useConference } from '@/entities/conference';
 import ParticipantVideo from '@/features/ParticipantVideo';
 import { useAppSelector } from '@/shared/lib/hooks/useAppSelector';
 import { useMediaQuery } from '@/shared/lib/hooks/useMediaQuery';
+import ChatWidget from '@/widgets/ChatWidget';
 import ConferenceFooter from '@/widgets/ConferenceFooter';
 import ParticipantsPanel from '@/widgets/ParticipantsPanel/ui';
 import React, { useEffect, useState } from 'react';
@@ -10,7 +11,6 @@ import copyCurrentUrl from '../../../shared/lib/copyCurrentPath';
 import { Button } from '../../../shared/ui/Button';
 import { Paragraph } from '../../../shared/ui/Paragraph';
 import './conferencePage.scss';
-import ChatWidget from '@/widgets/ChatWidget';
 
 const ConferencePage: React.FC = () => {
   const { pathname } = useLocation();

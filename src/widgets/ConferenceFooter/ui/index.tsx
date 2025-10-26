@@ -81,12 +81,12 @@ const ConferenceFooter = ({
           ) : (
             <div className="str-but">
               <MonitorUp color="#fff" />
-              <Paragraph
+              {!isMobile ?<Paragraph
                 mode="white"
                 level={3}
               >
                 Демонстрация экрана
-              </Paragraph>
+              </Paragraph>:null} 
             </div>
           )}
         </Button>
