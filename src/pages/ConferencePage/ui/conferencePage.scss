@@ -265,3 +265,15 @@
     justify-content: space-between;
   }
 }
+
+
+@media (max-width: $breakpoint-4) {
+  .ConferencePage {
+    overflow-x: hidden;
+  }
+
+  .conferenceFooter .conferenceFooter__rightSide {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
